@@ -5,6 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
 from django.views.generic import ListView
+import io
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
 from .models import Profile, Report
 from .forms import LoginForm, UserRegistrationForm, \
     UserEditForm, ProfileEditForm, ReportForm
@@ -111,3 +114,29 @@ class ReportListView(ListView):
 @login_required
 def submit_done(request):
     return render(request, 'account/submit_done.html', )
+
+@login_required
+def get_pdf(request,report_id):
+    report = Report.objects.get(id=report_id)
+    # Create a file-like buffer to receive PDF data.
+    buffer = io.BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    p = canvas.Canvas(buffer)
+
+    # Draw things on the PDF. Here's where the PDF generation happens.
+    # See the ReportLab documentation for the full list of functionality.
+    p.drawString(100, 100, report.client_name)
+
+    # Close the PDF object cleanly, and we're done.
+    p.showPage()
+    p.save()
+
+    # FileResponse sets the Content-Disposition header so that browsers
+    # present the option to save the file.
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
+
+
+
+
