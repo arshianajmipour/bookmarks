@@ -115,22 +115,187 @@ class ReportListView(ListView):
 def submit_done(request):
     return render(request, 'account/submit_done.html', )
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @login_required
-def get_pdf(request,report_id):
+def get_pdf2(request,report_id):
+    
+    from reportlab.lib.pagesizes import letter, A4
+    from reportlab.platypus import SimpleDocTemplate
+    from reportlab.lib.units import inch
+
     report = Report.objects.get(id=report_id)
     # Create a file-like buffer to receive PDF data.
     buffer = io.BytesIO()
 
     # Create the PDF object, using the buffer as its "file."
-    p = canvas.Canvas(buffer)
+    # p = canvas.Canvas(buffer, bottomup = 0, pagesize = letter)
+    my_doc = SimpleDocTemplate(
+            buffer,
+            pagesize=letter,
+            topMargin=inch,
+            leftMargin=inch,
+            rightMargin=0.67*inch,
+            bottomMargin=0.4*inch
+    )
+    width, height = letter
 
-    # Draw things on the PDF. Here's where the PDF generation happens.
-    # See the ReportLab documentation for the full list of functionality.
-    p.drawString(100, 100, report.client_name)
+
+    # select = int(select)
+    # if select == 1:
+        # p.drawString(100, 100, report.client_name)
+    # if select == 2:
+    from reportlab.platypus import Paragraph
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT
+    from copy import copy, deepcopy
+    import DateTime as dt
+
+
+    styles = getSampleStyleSheet()
+    styleN = styles['Normal']
+    styleN.fontName = 'Times-Roman'
+    styleH = styles['Heading1']
+
+    flowables = []
+    # textobject = p.beginText()
+    # textobject.setTextOrigin((2-0.62)*inch, inch)
+    # textobject.setFont("Helvetica-Oblique", 14)
+    # textobject.textLine('Juteau Johnson Comba Inc')
+    styleN.textColor = '#043475'
+    styleN.fontSize = 14
+    p2 = Paragraph('Juteau Johnson Comba Inc', styleN)
+    flowables.append(p2)
+    # textobject.setFillGray(0.5)
+    styleN.textColor = '#808080'
+    styleN.fontSize = 10
+    styleN.spaceBefore = 5
+    # textobject.textLine('Real Estate Appraisers & Consultants')
+    p3 = Paragraph('Real Estate Appraisers & Consultants', styleN)
+    flowables.append(p3)
+    # p.drawText(textobject)
+
+    # textobject = p.beginText()
+    # textobject.setTextOrigin(5.887*inch, 2.783*inch)
+    # textobject.setFillGray(0)
+    # textobject.textLine('Appraisal Report on:')
+    # p.drawText(textobject)
+
+    # textobject = p.beginText()
+    # textobject.setTextOrigin(6.403*inch, 4.061*inch)
+    # textobject.setFillGray(0)
+    # textobject.textLine('Appraisal Report on:')
+    # p.drawText(textobject)
+    # styles = getSampleStyleSheet()
+    style_right_big = ParagraphStyle('style_right_big',
+    fontSize=16,
+    alignment=TA_RIGHT,
+    leading=18.5,
+    fontName='Times-Roman',
+    )
+    
+    # styles.add(ParagraphStyle(name='RightAlign', alignment=TA_RIGHT))
+    # styles.add(ParagraphStyle(name='FontSize', fontSize=16))
+    # style_right_align = styles['RightAlign']
+    style_right_big2 = deepcopy(style_right_big)
+    style_right_big2.textColor = '#043475'
+    style_right_big2.spaceBefore = 87.5
+    style_right_big2.spaceAfter = 0
+    # style_right_big2.leading = 0
+    p11 = Paragraph('Appraisal Report on:', style_right_big2)
+    flowables.append(p11)
+    # style_right_big.textColor = '#000000'
+    p1 = Paragraph(report.location, style_right_big)
+    # p1.wrapOn(p, 400, 60)
+    # p1.drawOn(p, width-450, 150)
+    flowables.append(p1)
+
+    style_right_big3 = deepcopy(style_right_big2)
+    style_right_big3.spaceBefore = 38
+
+    p12 = Paragraph('Effective Date:', style_right_big3)
+    flowables.append(p12)
+    p22 = Paragraph(report.effective_date.strftime('%b %d, %Y'), style_right_big)
+    flowables.append(p22)
+
+    p12 = Paragraph('Report Date:', style_right_big3)
+    flowables.append(p12)
+    p22 = Paragraph(report.report_date.strftime('%b %d, %Y'), style_right_big)
+    flowables.append(p22)
+
+    p12 = Paragraph('Prepared For:', style_right_big3)
+    flowables.append(p12)
+    p22 = Paragraph(report.client_name, style_right_big)
+    flowables.append(p22)
+
+
+    style_contactus = deepcopy(styleN)
+    style_contactus.alignment = TA_CENTER
+    style_contactus.fontSize = 12
+    style_contactus.leading = 12
+    style_contactus.textColor = '#043475'
+    style_contactus.rightIndent = -280
+    style_contactus.spaceBefore = 150
+
+    p_contactus = Paragraph('''2255 St. Laurent Blvd.<br/>\
+    Suite 340<br/>\
+    Ottawa, Ontario<br/>\
+    K1G 4K3<br/><br/>\
+    www.juteaujohnsoncomba.com<br/><br/>\
+    Phone: 613-738-2426<br/>\
+    Fax: 613-738-0429<br/><br/>''', style_contactus)
+    style_contactus2 = deepcopy(style_contactus)
+    style_contactus2.fontSize = 10
+    style_contactus2.spaceBefore = 0
+    p_contactus2 = Paragraph('<i>© 2022 Juteau Johnson Comba Inc</i>', style_contactus2)
+    flowables.append(p_contactus)
+    flowables.append(p_contactus2)
 
     # Close the PDF object cleanly, and we're done.
-    p.showPage()
-    p.save()
+    # p.showPage()
+    # p.save()
+    my_doc.build(
+        flowables
+    )
 
     # FileResponse sets the Content-Disposition header so that browsers
     # present the option to save the file.
