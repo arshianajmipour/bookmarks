@@ -8,6 +8,8 @@ from django.views.generic import ListView
 import io
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.platypus import Paragraph
 from .models import Profile, Report
 from .forms import LoginForm, UserRegistrationForm, \
     UserEditForm, ProfileEditForm, ReportForm
@@ -124,8 +126,14 @@ def get_pdf(request,report_id):
     # Create the PDF object, using the buffer as its "file."
     p = canvas.Canvas(buffer)
 
+
     # Draw things on the PDF. Here's where the PDF generation happens.
     # See the ReportLab documentation for the full list of functionality.
+ 
+    p1 = Paragraph('''SUMMARY OF SALIENT FACTS AND IMPORTANT CONCLUSIONS''')
+    p1.wrapOn(p,300,500)
+    p1.drawOn(p,200,750)
+    p.drawString(100, 120, 'client name : ')
     p.drawString(100, 100, report.client_name)
 
     # Close the PDF object cleanly, and we're done.
