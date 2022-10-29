@@ -132,41 +132,18 @@ class Reporter:
 
             FA( Paragraph('Real Estate Appraisers & Consultants', self.style_header2) )
 
-            
-            self.style_right_big = ParagraphStyle('self.style_right_big',
-            fontSize=16,
-            alignment=TA_RIGHT,
-            leading=18.5,
-            fontName='Times-Roman',
-            )
-            
-            self.style_right_big2 = deepcopy(self.style_right_big)
-            self.style_right_big2.textColor = '#043475'
-            self.style_right_big2.spaceBefore = 87.5
-            self.style_right_big2.spaceAfter = 0
-            FA( Paragraph('Appraisal Report on:', self.style_right_big2) )
+            FA( Paragraph('Appraisal Report on:', self.style_right_big_spaceBefore_big) )
             FA( Paragraph(self.report.location, self.style_right_big) )
 
-            self.style_right_big3 = deepcopy(self.style_right_big2)
-            self.style_right_big3.spaceBefore = 38
-
-            FA( Paragraph('Effective Date:', self.style_right_big3) )
+            FA( Paragraph('Effective Date:', self.style_right_big_spaceBefore_small) )
             FA( Paragraph(self.report.effective_date.strftime('%b %d, %Y'), self.style_right_big) )
 
-            FA( Paragraph('Report Date:', self.style_right_big3) )
+            FA( Paragraph('Report Date:', self.style_right_big_spaceBefore_small) )
             FA( Paragraph(self.report.report_date.strftime('%b %d, %Y'), self.style_right_big) )
 
-            FA( Paragraph('Prepared For:', self.style_right_big3) )
+            FA( Paragraph('Prepared For:', self.style_right_big_spaceBefore_small) )
             FA( Paragraph(self.report.client_name, self.style_right_big) )
 
-
-            self.style_contactus = deepcopy(self.styleN)
-            self.style_contactus.alignment = TA_CENTER
-            self.style_contactus.fontSize = 12
-            self.style_contactus.leading = 12
-            self.style_contactus.textColor = '#043475'
-            self.style_contactus.rightIndent = -280
-            self.style_contactus.spaceBefore = 150
 
             FA( Paragraph('''2255 St. Laurent Blvd.<br/>\
             Suite 340<br/>\
@@ -176,8 +153,5 @@ class Reporter:
             Phone: 613-738-2426<br/>\
             Fax: 613-738-0429<br/><br/>''', self.style_contactus) )
 
-            self.style_contactus2 = deepcopy(self.style_contactus)
-            self.style_contactus2.fontSize = 10
-            self.style_contactus2.spaceBefore = 0
             FA( Paragraph('<i>© 2022 Juteau Johnson Comba Inc</i>', self.style_contactus2) )
         
