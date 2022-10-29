@@ -1,0 +1,35 @@
+[
+{
+    "model": "account.profile",
+    "pk": 1,
+    "fields": {
+        "user": 3,
+        "date_of_birth": null,
+        "photo": ""
+    }
+},
+{
+    "model": "account.report",
+    "pk": 1,
+    "fields": {
+        "client_name": "Arshia",
+        "report_date": "2022-10-28",
+        "effective_date": "2022-10-29",
+        "ref_code": "243",
+        "firstname": "Arshia",
+        "lastname": "Najmipour",
+        "email": "arshianajmipour@gmail.com",
+        "phone_number": "09134431380",
+        "location": "Isfahan",
+        "latitude": 23.0,
+        "longitude": -20.0,
+        "dropdown_feature": 1,
+        "textarea1": "sahjdgsajkdgsdaf",
+        "textarea2": "dshafgwyevdeywfcewfewf",
+        "textarea3": "qwgcdtegwhfbequwfbhqe3",
+        "radio_button_feature": 2,
+        "receive_newsletter": true,
+        "fpdf": ""
+    }
+}
+]

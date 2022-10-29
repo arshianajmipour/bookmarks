@@ -18,5 +18,4 @@ urlpatterns = [
 
 
     
-    path('get_pdf2/<report_id>',views.get_pdf2 , name='get_pdf2'),
 ]

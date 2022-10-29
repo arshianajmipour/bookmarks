@@ -12,6 +12,7 @@ class Profile(models.Model):
 
 
 class Report(models.Model):
+    import datetime
     DROPDOWN_CHOICES = (
         (1, 'A'),
         (2, 'B'),
@@ -42,3 +43,6 @@ class Report(models.Model):
                                                verbose_name='Radio Button Feature')
     receive_newsletter = models.BooleanField(null=True, blank=True, verbose_name='Receive NewsLetter')
     fpdf = models.FileField(upload_to='reports/%Y/%m/%d/',null=True, blank=True, verbose_name='Report File')
+
+    def getEffectiveDateAsString(self):
+        return datetime.datetime(self.effective_date).strftime('%b %d, %Y')
