@@ -91,6 +91,9 @@ class Reporter:
         self.style_left_context_indent12 = deepcopy(self.style_left_context)
         self.style_left_context_indent12.leftIndent = 12
 
+        self.style_left_context_indent20 = deepcopy(self.style_left_context)
+        self.style_left_context_indent20.leftIndent = 20
+ 
         self.style_left_listitem = deepcopy(self.style_left_context)
         self.style_left_listitem.spaceBefore = 0
         self.style_left_listitem.alignment = TA_LEFT
@@ -232,7 +235,7 @@ class Reporter:
 
         FA(PageBreak())
         #/////////////////////////////////// page 5 /////////////////////////////////////////////////////////
-        #/////////////////////////////////// page 6 /////////////////////////////////////////////////////////
+        #/////////////////////////////////// page 6 & 7 /////////////////////////////////////////////////////////
         style_title2 = deepcopy(self.style_title)
         style_title2.borderPadding = (100,100,100)
         FA( Paragraph("SUMMARY OF SALIENT FACTS AND IMPORTANT CONCLUSIONS", style_title2) )
@@ -266,15 +269,15 @@ Comba Inc.
 
         data = [[Paragraph('Location:', self.style_left_context),
                 Paragraph('''The subject property is located on the west side of Labrie
-Avenue, to the south of Cyrville Road, in theCyrville Industrial
-Area, in the east end of the City of Ottawa.''', self.style_left_context)],
+                    Avenue, to the south of Cyrville Road, in theCyrville Industrial
+                    Area, in the east end of the City of Ottawa.''', self.style_left_context)],
                 [Paragraph('Municipal Address:', self.style_left_context),
                 Paragraph('''1368 Labrie Avenue, Ottawa, Ontario''', self.style_left_context)],
                 [Paragraph('Legal Description:', self.style_left_context),
                 Paragraph('''The subject property is identified in the Land Registry Office as
-Part of Lot 25, Concession 2, Ottawa Front; designated as Part
-1 on Plan 4R-11032; in the former City of Gloucester, now in
-the City of Ottawa. PIN 04263-0224.''', self.style_left_context)],
+                    Part of Lot 25, Concession 2, Ottawa Front; designated as Part
+                    1 on Plan 4R-11032; in the former City of Gloucester, now in
+                    the City of Ottawa. PIN 04263-0224.''', self.style_left_context)],
                 [Paragraph('Site Area:', self.style_left_context),
                 Paragraph('14,962 square feet', self.style_left_context)],
                 [Paragraph('Zoning:', self.style_left_context),
@@ -342,3 +345,85 @@ investigations such as:''', self.style_left_context_spaceAfter ) )
         )
 
         FA( t )
+        FA( Paragraph('''Appraisers are not qualified in professional matters like land surveying, engineering, architecture and
+the law, nor are they qualified as building inspectors. Investigations into matters such as these do not
+form part of an appraiser's investigations. We have assumed that there are no hidden or unapparent
+conditions of the property, sub-soil orstructuresthat render it more or less valuable. No responsibility
+is assumed forsuch conditions or for arranging for engineering studiesthat may be required to discover
+them. Where matters were noted that appeared unusual, they have been noted in this report. The
+services of experts in these fields are required to investigate the possibility that defects are present.
+''', self.style_left_context_spaceAfter ) )
+
+        FA( Paragraph('''An environmental audit has not been conducted in conjunction with the preparation of thisreport. It is
+assumed that hazardoussubstances do not exist. Itshould be clearlyunderstood that we are not qualified
+to detect, test for, investigate, or otherwise ascertain the existence of such substances. As such, we do
+not assume any responsibility for their existence or any costs associated with their removal, correction,
+or treatment, in the event that they are found to exist on the subject property, or on adjacent lands.
+Further, it is assumed that soils are suitable to support development.
+''', self.style_left_context_spaceAfter ) )
+
+        FA(PageBreak())
+    #///////////////////////////////////////// page9 //////////////////////////////////////////////////////
+        FA(Paragraph('TERMS OF REFERENCE',self.style_title))
+        FA(Paragraph('<B>Purpose of Appraisal</B>',self.style_left_titr))
+        FA(Paragraph('''The purpose of this appraisal is to estimate the current market value of the fee simple interest in the
+subject property based on its highest and best use. Our value estimate is free and clear of mortgage or
+other encumbrances, unless otherwise indicated, and are subject to the following assumptions:'''
+            ,self.style_left_context_spaceAfter))
+        t = ListFlowable(
+            [
+                ListItem(Paragraph('the property is free and clear of any mortgage charges or title encumbrances;', self.style_left_listitem), leftIndent=1*inch),
+                ListItem(Paragraph('''the subject soils are suitable for development;'''
+                    , self.style_left_listitem), leftIndent=1*inch),
+                ListItem(Paragraph('the subject property and neighbouring lands are free of environmental contaminants; and', self.style_left_listitem), leftIndent=1*inch),
+                ListItem(Paragraph(''' there are no servicing constraints or extraordinary costs related to the servicing or
+                    development of the site.''', 
+                    self.style_left_listitem), leftIndent=1*inch),
+            ]
+            , start="square", bulletType='bullet', leftIndent=0.8*inch
+        )
+        FA(t)
+        FA(Paragraph('<B>Intended Use/User of Appraisal</B>',self.style_left_titr))
+        FA(Paragraph('''The intended use of the appraisal is to assist the client in estimating the market value of the subject
+            property for mortgage financing purposes. The intended user of this appraisal is'''+
+            self.report.location+
+            '''Liability is expressly denied for any other use or user without our (Juteau Johnson Comba Inc) prior
+            written consent.
+            ''' , self.style_left_context_spaceAfter))
+        FA(Paragraph('<B>Definition of Market Value</B>',self.style_left_titr))
+        FA(Paragraph('For the purpose of this appraisal, market value is defined as:',self.style_left_context_spaceAfter))
+        FA(Paragraph('''<I>The most probable price, as of a specified date, in cash, or in terms equivalent to cash, or in
+            other precisely revealed terms, for which the specified property rights should sell after
+            reasonable exposure in a competitive market under all conditions requisite to a fair sale, with
+            the buyer and the seller each acting prudently, knowledgeable, and for self-interest, assuming
+            that neither is under duress.</I>
+            ''',self.style_left_context_indent20))
+        FA(Paragraph('Definition of Exposure Time',self.style_left_titr))
+        FA(Paragraph('''<I>Exposure time, as per the Canadian Uniform Standards of Professional Appraisal Practice (CUSPAP)
+            dated January 1, 2022, may be defined as follows:</I>''',self.style_left_context_indent20))
+        FA(Paragraph('''Exposure time is differentfor varioustypes ofreal estate and under variousmarket conditions. Itshould
+            be noted that the overall concept of reasonable exposure encompasses not only adequate,sufficient and
+            reasonable time but also adequate, sufficient and reasonable effort.''',self.style_left_context_spaceAfter)
+        )
+        FA(Paragraph('Our valuation is based on a reasonable exposure time of two to four months.',self.style_left_context_spaceAfter))
+        FA(Paragraph('<B>Property Rights Under Appraisal</B>',self.style_left_titr))
+        FA(Paragraph('''The property ownership right under appraisal is that of the fee simple interest in the subject property.
+            Fee simple interest is defined as:''',self.style_left_context_spaceAfter))
+        FA(Paragraph('''<I>“...absolute ownership of property unencumbered by any other interest or estate and subject
+            only to the powers of government.”
+            </I>''',self.style_left_context_indent20))
+        FA(Paragraph('<B>Effective Date of Appraisal</B>',self.style_left_titr))
+        FA(Paragraph('The effective date of appraisal is'+self.report.effective_date.strftime('%b %d, %Y')
+        ,self.style_left_context_spaceAfter))
+        FA(Paragraph('<B>Date of Inspection</B>',self.style_left_titr))
+        FA(Paragraph('''Inspection, as per theCanadian UniformStandards of Professional Appraisal Practice (CUSPAP) dated'''+
+        self.report.report_date.strftime('%b %d, %Y')+'may be defined as follows:',self.style_left_context_spaceAfter))
+        FA(Paragraph('''<I>“An observation, site visit, walk through, viewing or non-invasive visual examination
+            of a property.”</I>
+            ''',self.style_left_context_indent20))
+        FA(Paragraph('A drive-by inspection of the subject property was undertaken on'+
+        self.report.effective_date.strftime('%b %d, %Y'),self.style_left_context_spaceAfter))
+        FA(PageBreak())
+
+        
+        
