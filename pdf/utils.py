@@ -398,7 +398,7 @@ other encumbrances, unless otherwise indicated, and are subject to the following
             the buyer and the seller each acting prudently, knowledgeable, and for self-interest, assuming
             that neither is under duress.</I>
             ''',self.style_left_context_indent20))
-        FA(Paragraph('Definition of Exposure Time',self.style_left_titr))
+        FA(Paragraph('<B>Definition of Exposure Time</B>',self.style_left_titr))
         FA(Paragraph('''<I>Exposure time, as per the Canadian Uniform Standards of Professional Appraisal Practice (CUSPAP)
             dated January 1, 2022, may be defined as follows:</I>''',self.style_left_context_indent20))
         FA(Paragraph('''Exposure time is differentfor varioustypes ofreal estate and under variousmarket conditions. Itshould

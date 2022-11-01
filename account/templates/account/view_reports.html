@@ -7,5 +7,6 @@
   {% for report in reports %}
     <h2>report</h2>
     <h3>{{report.client_name}}</h3>
+    <a href="/pdf/get_pdf3/{{report.id}}">download the pdf</a>
   {% endfor %}
 {% endblock %}

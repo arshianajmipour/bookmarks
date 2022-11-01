@@ -176,20 +176,22 @@ def get_pdf2(request,report_id):
             buffer,
             pagesize=letter,
             topMargin=inch,
-            leftMargin=0.9*inch,
-            rightMargin=0.64*inch,
+            leftMargin=inch,
+            rightMargin=0.67*inch,
             bottomMargin=0.4*inch
     )
     width, height = letter
 
-    # select = int(select)
+
+
+
+     # select = int(select)
     # if select == 1:
         # p.drawString(100, 100, report.client_name)
     # if select == 2:
-    from reportlab.platypus import Paragraph, PageBreak
-    from reportlab.platypus import ListFlowable, ListItem
+    from reportlab.platypus import Paragraph
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT, TA_JUSTIFY
+    from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT
     from copy import copy, deepcopy
     import DateTime as dt
 
@@ -200,24 +202,21 @@ def get_pdf2(request,report_id):
     styleH = styles['Heading1']
 
     flowables = []
-
-    FA = flowables.append
-
-
-    #/////////////////////////////////// page 1 ///////////////////////////////////
     # textobject = p.beginText()
     # textobject.setTextOrigin((2-0.62)*inch, inch)
     # textobject.setFont("Helvetica-Oblique", 14)
     # textobject.textLine('Juteau Johnson Comba Inc')
     styleN.textColor = '#043475'
     styleN.fontSize = 14
-    FA( Paragraph('Juteau Johnson Comba Inc', styleN) )
+    p2 = Paragraph('Juteau Johnson Comba Inc', styleN)
+    flowables.append(p2)
     # textobject.setFillGray(0.5)
     styleN.textColor = '#808080'
     styleN.fontSize = 10
     styleN.spaceBefore = 5
     # textobject.textLine('Real Estate Appraisers & Consultants')
-    FA( Paragraph('Real Estate Appraisers & Consultants', styleN) )
+    p3 = Paragraph('Real Estate Appraisers & Consultants', styleN)
+    flowables.append(p3)
     # p.drawText(textobject)
 
     # textobject = p.beginText()
@@ -247,23 +246,31 @@ def get_pdf2(request,report_id):
     style_right_big2.spaceBefore = 87.5
     style_right_big2.spaceAfter = 0
     # style_right_big2.leading = 0
-    FA( Paragraph('Appraisal Report on:', style_right_big2) )
+    p11 = Paragraph('Appraisal Report on:', style_right_big2)
+    flowables.append(p11)
     # style_right_big.textColor = '#000000'
-    FA( Paragraph(report.location, style_right_big) )
+    p1 = Paragraph(report.location, style_right_big)
     # p1.wrapOn(p, 400, 60)
     # p1.drawOn(p, width-450, 150)
+    flowables.append(p1)
 
     style_right_big3 = deepcopy(style_right_big2)
     style_right_big3.spaceBefore = 38
 
-    FA( Paragraph('Effective Date:', style_right_big3) )
-    FA( Paragraph(report.effective_date.strftime('%b %d, %Y'), style_right_big) )
+    p12 = Paragraph('Effective Date:', style_right_big3)
+    flowables.append(p12)
+    p22 = Paragraph(report.effective_date.strftime('%b %d, %Y'), style_right_big)
+    flowables.append(p22)
 
-    FA( Paragraph('Report Date:', style_right_big3) )
-    FA( Paragraph(report.report_date.strftime('%b %d, %Y'), style_right_big) )
+    p12 = Paragraph('Report Date:', style_right_big3)
+    flowables.append(p12)
+    p22 = Paragraph(report.report_date.strftime('%b %d, %Y'), style_right_big)
+    flowables.append(p22)
 
-    FA( Paragraph('Prepared For:', style_right_big3) )
-    FA( Paragraph(report.client_name, style_right_big) )
+    p12 = Paragraph('Prepared For:', style_right_big3)
+    flowables.append(p12)
+    p22 = Paragraph(report.client_name, style_right_big)
+    flowables.append(p22)
 
 
     style_contactus = deepcopy(styleN)
@@ -274,117 +281,108 @@ def get_pdf2(request,report_id):
     style_contactus.rightIndent = -280
     style_contactus.spaceBefore = 150
 
-    FA( Paragraph('''2255 St. Laurent Blvd.<br/>\
+    p_contactus = Paragraph('''2255 St. Laurent Blvd.<br/>\
     Suite 340<br/>\
     Ottawa, Ontario<br/>\
     K1G 4K3<br/><br/>\
     www.juteaujohnsoncomba.com<br/><br/>\
     Phone: 613-738-2426<br/>\
-    Fax: 613-738-0429<br/><br/>''', style_contactus) )
-
+    Fax: 613-738-0429<br/><br/>''', style_contactus)
     style_contactus2 = deepcopy(style_contactus)
     style_contactus2.fontSize = 10
     style_contactus2.spaceBefore = 0
-    FA( Paragraph('<i>© 2022 Juteau Johnson Comba Inc</i>', style_contactus2) )
-
-    # Close the PDF object cleanly, and we're done.
-    # p.showPage()
-    # p.save()
+    p_contactus2 = Paragraph('<i>© 2022 Juteau Johnson Comba Inc</i>', style_contactus2)
+    flowables.append(p_contactus)
+    flowables.append(p_contactus2)
 
     #/////////////////////////////////// page 2 ///////////////////////////////////
-    FA(PageBreak())
+    flowables.append(PageBreak())
     styleN.textColor = '#043475'
     styleN.fontSize = 14
-    FA( Paragraph('Juteau Johnson Comba Inc', styleN) )
+    p2 = Paragraph('Juteau Johnson Comba Inc', styleN)
+    flowables.append(p2)
     # textobject.setFillGray(0.5)
     styleN.textColor = '#808080'
     styleN.fontSize = 10
     styleN.spaceBefore = 5
     # textobject.textLine('Real Estate Appraisers & Consultants')
-    FA( Paragraph('Real Estate Appraisers & Consultants', styleN) )
+    p3 = Paragraph('Real Estate Appraisers & Consultants', styleN)
+    flowables.append(p3)
 
     style_right_small = ParagraphStyle('style_right_small',
-    fontSize=12,
+    fontSize=11,
     alignment=TA_RIGHT,
     leading=18.5,
     fontName='Times-Roman',
     )
-    FA( Paragraph(report.report_date.strftime('%b %d, %Y'), style_right_small) )
-    FA( Paragraph('Reference No. ' + report.ref_code, style_right_small) )
+    p1 = Paragraph(report.report_date.strftime('%b %d, %Y'), style_right_small)
+    flowables.append(p1)
+    p1 = Paragraph('\n Reference No. ' + report.ref_code, style_right_small)
+    flowables.append(p1)
 
-    style_left_small = deepcopy(style_right_small)
-    style_left_small.alignment = TA_LEFT
-    FA( Paragraph(report.location, style_left_small) )
-    FA( Paragraph('<br/>Dear ' + report.client_name, style_left_small) )
-
-    style_left_titr = deepcopy(style_right_big)
-    style_left_titr.alignment = TA_LEFT
-    style_left_titr.fontSize = 12
-    style_left_titr.spaceBefore = 10
-    FA( Paragraph("<b>Re:<font color='white'>TTTTT</font>Appraisal Report on " + report.location + "</b><br/>", style_left_titr) )
-
-    
-    style_left_context = deepcopy(style_left_titr)
-    style_left_context.fontSize = 11.5
-    style_left_context.leading = 14
-    style_left_context.alignment = TA_JUSTIFY
-    style_left_context.justifyBreaks = 1
-
-    style_left_context_spaceAfter = deepcopy(style_left_context)
-    style_left_context_spaceAfter.spaceAfter = 15
-    FA( Paragraph('''In accordance with your request, we have inspected the above-noted property in order to provide you with
-    an estimate of the current market value of the fee simple interest in the property based on its highest and
-    best use, for mortgage financing purposes. The effective date of appraisal is {date}, the date a
-    drive-by inspection of the property was completed. Our value estimate is subject to the following
-    assumptions and limiting conditions:'''.format(date = report.effective_date.strftime('%b %d, %Y')), style_left_context_spaceAfter) )
-
-    style_left_listitem = deepcopy(style_left_context)
-    style_left_listitem.spaceBefore = 0
-    style_left_listitem.alignment = TA_LEFT
-    t = ListFlowable(
-        [
-            ListItem(Paragraph('the property is free and clear of any mortgage charges or title encumbrances;', style_left_listitem), leftIndent=41),
-            ListItem(Paragraph('the subject soils are suitable for development;', style_left_listitem), leftIndent=41),
-            ListItem(Paragraph('the subject property and neighbouring lands are free of environmental contaminants; and', style_left_listitem), leftIndent=41),
-            ListItem(Paragraph('''there are no servicing constraints or extraordinary costs related to the servicing or development
-            of the site.
-            ''', style_left_listitem), leftIndent=41),
-        ], start="➢", bulletType='bullet', leftIndent=20
+    style_left_small = ParagraphStyle('style_right_small',
+    fontSize=11,
+    alignment=TA_LEFT,
+    leading=18.5,
+    fontName='Times-Roman',
     )
+    p1 = Paragraph(report.location, style_left_small)
+    flowables.append(p1)
+    p1 = Paragraph('\n Dear ' + report.client_name, style_left_small)
+    flowables.append(p1)
 
-    FA( t )
-
+    style_left_big = ParagraphStyle('style_right_big',
+    fontSize=14,
+    alignment=TA_LEFT,
+    leading=18.5,
+    fontName='Times-Roman',
+    )
+    p1 = Paragraph('Re: Appraisal Report on \t' + report.location + '\n', style_left_big)
+    flowables.append(p1)
     style_contactus3= deepcopy(style_contactus)
     style_contactus3.fontSize = 10
     style_contactus3.spaceBefore = 0
     style_contactus3.rightIndent =0
     style_contactus3.spaceBefore = 0
-    FA( Paragraph('''2255 St. Laurent Blvd.\
+    p_contactus = Paragraph('''2255 St. Laurent Blvd.\
     Suite 340\
     Ottawa, Ontario\
-    K1G 4K3<br/>\
+    K1G 4K3\
     Phone: 613-738-2426\
-    Fax: 613-738-0429''', style_contactus3) )
+    Fax: 613-738-0429''', style_contactus3)
     
+    p_contactus2 = Paragraph('<i>© 2022 Juteau Johnson Comba Inc</i>', style_contactus3)
+    flowables.append(p_contactus)
+    flowables.append(p_contactus2)
+
     #////////////////////////////////page3//////////////////////////////////////
 
-    FA( PageBreak() )
+    flowables.append(PageBreak())
     styleN.textColor = '#043475'
     styleN.fontSize = 14
-    FA( Paragraph('Juteau Johnson Comba Inc', styleN) )
+    p2 = Paragraph('Juteau Johnson Comba Inc', styleN)
+    flowables.append(p2)
     # textobject.setFillGray(0.5)
     styleN.textColor = '#808080'
     styleN.fontSize = 10
     styleN.spaceBefore = 5
     # textobject.textLine('Real Estate Appraisers & Consultants')
-    FA( Paragraph(' Real Estate Appraisers & Consultants \n \n', styleN) )
-    FA( Paragraph('page 2', style_left_small) )
-    FA( Paragraph('\n Reference No. ' + report.ref_code, style_left_small) )
-    FA( Paragraph(report.report_date.strftime('%b %d, %Y'), style_left_small) )
+    p3 = Paragraph(' Real Estate Appraisers & Consultants \n \n', styleN)
+    flowables.append(p3)
+    p1 = Paragraph('page 2', style_left_small)
+    p2 = Paragraph('\n Reference No. ' + report.ref_code, style_left_small)
+    p3 = Paragraph(report.report_date.strftime('%b %d, %Y'), style_left_small)
+    flowables.append(p1)
+    flowables.append(p2)
+    flowables.append(p3)
+
 
     my_doc.build(
         flowables
     )
+
+
+
 
     # FileResponse sets the Content-Disposition header so that browsers
     # present the option to save the file.
