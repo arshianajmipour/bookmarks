@@ -1,10 +1,11 @@
 import io
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.platypus import SimpleDocTemplate
+from reportlab.lib.colors import yellow, green, red, black, gray
 from reportlab.lib.units import inch
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import Paragraph, PageBreak
-from reportlab.platypus import ListFlowable, ListItem, Table, TableStyle
+from reportlab.platypus import ListFlowable, ListItem, Table, TableStyle, Frame, NextPageTemplate, PageTemplate
 from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT, TA_JUSTIFY
 from copy import copy, deepcopy
 from django.http import FileResponse
@@ -18,6 +19,15 @@ class Reporter:
     def __init__(self, report):
         self.flowables = []
         self.report = report
+        self.buffer = io.BytesIO()
+        self.template = SimpleDocTemplate(
+            self.buffer,
+            pagesize=letter,
+            topMargin=inch,
+            leftMargin=0.9*inch,
+            rightMargin=0.64*inch,
+            bottomMargin=0.4*inch
+        )
 
 
         ################################## Paragraph Styles #################################################
@@ -116,18 +126,62 @@ class Reporter:
             ('TOPPADDING', (0, 0), (-1, -1), 0.5),
         ])
 
+
+
+        ################################## Templates ###################################################
+        frameT = Frame(
+            self.template.leftMargin,
+            self.template.bottomMargin,
+            self.template.width,
+            self.template.height, id='normal'
+        )
+        def makeHeaderFooterMain(canvas, doc):
+            import reportlab.rl_config
+            reportlab.rl_config.warnOnMissingFontGlyphs = 0
+            
+
+            from reportlab.pdfbase import pdfmetrics
+            from reportlab.pdfbase.ttfonts import TTFont
+            # pdfmetrics.registerFont(TTFont('Times-Roman-Italic', './time-roman-italic.ttf'))
+
+            canvas.saveState()
+            textobject = canvas.beginText()
+            textobject.setTextOrigin(
+                doc.leftMargin + 0.1*inch,
+                doc.height + doc.bottomMargin + 0.4*inch,
+            )
+            textobject.setFont("Times-Roman", 10)
+            textobject.setFillGray(0.5)
+            textobject.textLines(
+                '''11966685 Canada Inc.
+                Appraisal Report on 1368 Labrie Avenue, Ottawa, Ontario'''
+            )
+            canvas.drawText(textobject)
+
+
+            canvas.drawString(
+                doc.leftMargin + doc.width - 0.1*inch,
+                doc.height + doc.bottomMargin + 0.3*inch,
+                "%d" % canvas.getPageNumber()
+            )
+
+            canvas.setStrokeColor(gray)
+            p = canvas.beginPath()
+            p.moveTo(doc.leftMargin + 0.1*inch, doc.height + doc.bottomMargin + 0.2*inch)
+            p.lineTo(doc.leftMargin + doc.width, doc.height + doc.bottomMargin + 0.2*inch)
+            p.close()
+            canvas.drawPath(p)
+            # canvas.drawString(inch, 0.75 * inch, "Page %d" % doc.page)
+            # canvas.drawString(
+            #     self.template.leftMargin,
+            #     self.template.height + self.template.bottomMargin + 0.5*inch,
+            #     '''11966685 Canada Inc Appraisal Report on 1368 Labrie Avenue, Ottawa, Ontario '''
+            # )
+            canvas.restoreState()
+        self.template.addPageTemplates([PageTemplate(id='main', frames=frameT, onPage=makeHeaderFooterMain)])
         
 
     def createTemplate(self):
-        self.buffer = io.BytesIO()
-        self.template = SimpleDocTemplate(
-            self.buffer,
-            pagesize=letter,
-            topMargin=inch,
-            leftMargin=0.9*inch,
-            rightMargin=0.64*inch,
-            bottomMargin=0.4*inch
-        )
 
         # for i in range(1, 3):
         self.createPage()
@@ -140,6 +194,9 @@ class Reporter:
         )
         self.buffer.seek(0)
         return FileResponse(self.buffer, as_attachment=True, filename='hello.pdf')
+
+    def addTemplateToNextPage(self, template_id):
+        self.flowables.append(NextPageTemplate(template_id))
 
 
     def createPage(self):
@@ -230,7 +287,9 @@ class Reporter:
         #/////////////////////////////////// page 4 /////////////////////////////////////////////////////////
         FA( Paragraph("AERIAL PHOTOGRAPH OF SUBJECT PROPERTY", self.style_title) )
 
+        self.addTemplateToNextPage('main')
         FA(PageBreak())
+        
         #/////////////////////////////////// page 5 /////////////////////////////////////////////////////////
         #/////////////////////////////////// page 6 /////////////////////////////////////////////////////////
         style_title2 = deepcopy(self.style_title)
