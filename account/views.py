@@ -14,6 +14,7 @@ from .models import Profile, Report
 from .forms import LoginForm, UserRegistrationForm, \
     UserEditForm, ProfileEditForm, ReportForm
 from .utils import make_flowables
+from django.contrib.auth import logout
 
 
 def user_login(request):
@@ -27,18 +28,18 @@ def user_login(request):
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    return HttpResponse('Authenticated ' \
-                                        'successfully')
+                    return HttpResponseRedirect('/accounts/')
                 else:
                     return HttpResponse('Disabled account')
             else:
                 return HttpResponse('Invalid login')
     else:
+        logout(request)
         form = LoginForm()
-    return render(request, 'account/login.html', {'form': form})
+    return HttpResponseRedirect('/accounts/login')
 
 
-# @login_required
+@login_required
 def dashboard(request):
     return render(request,
                   'account/dashboard.html',

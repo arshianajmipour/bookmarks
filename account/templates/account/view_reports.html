@@ -3,10 +3,28 @@
 {% block title %}View Reports{% endblock %}
 
 {% block content %}
+<div class="d-flex flex-column align-items-center container mt-2 text-secondary">
   <h1>Reports</h1>
-  {% for report in reports %}
-    <h2>report</h2>
-    <h3>{{report.client_name}}</h3>
-    <a href="/pdf/get_pdf3/{{report.id}}">download the pdf</a>
-  {% endfor %}
+  
+  <table class="table">
+    <thead>
+      <tr>
+        <td>client_name</td>
+        <td>pdf file</td>
+        <td>effective date</td>
+        <td>report date</td>
+      </tr>
+    </thead>
+    <tbody>
+      {% for report in reports %}
+        <tr>
+          <td>{{report.client_name}}</td>
+          <td><a href="/pdf/get_pdf3/{{report.id}}">download the pdf</a></td>
+          <td>{{report.effective_date}}</td>
+          <td>{{report.report_date}}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

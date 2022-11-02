@@ -5,9 +5,11 @@
 {% block content %}
   <h1>Log-in</h1>
   <p>Please, use the following form to log-in:</p>
-  <form method="post">
-    {{ form.as_p }}
+  <form method="post" class="d-flex flex-column align-items-center container mt-2">
+    <div class="col-md-6 card px-5 py-5 d-flex justify-content-center  text-secondary">
+    {{ form.as_table }}
     {% csrf_token %}
     <p><input type="submit" value="Log in"></p>
+    </div>
   </form>
 {% endblock %}

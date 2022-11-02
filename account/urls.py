@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.dashboard, name='dashboard'),
     path('', include('django.contrib.auth.urls')),
     path('register/', views.register, name='register'),
+    path('login2/',views.user_login, name='login'),
     path('edit/', views.edit, name='edit'),
     path('add_report/', views.add_report, name='add_report'),
     path('view_reports/', login_required(views.ReportListView.as_view()), name='view_reports'),
