@@ -3,16 +3,17 @@
 {% block title %}Edit your account{% endblock %}
 
 {% block content %}
-  <h1>Edit your account</h1>
-  <p>You can edit your account using the following form:</p>
+
   <form method="post" class="d-flex flex-column align-items-center container mt-2" enctype="multipart/form-data">
     <div class="col-md-6 card px-5 py-5 d-flex justify-content-center  text-secondary">
+      <h1>Edit your account</h1>
+      <p>You can edit your account using the following form:</p>
       {{ user_form.as_table }}
       {{ profile_form.as_table }}
       {% csrf_token %}
       <div class="control-group">
-        <div class="controls">
-            <button type="submit" class="btn btn-primary ">create report</button>
+        <div class="controls col text-center">
+          <button type="submit" class="btn btn-primary mt-2">edit</button>
         </div>
       </div>
     </div>
