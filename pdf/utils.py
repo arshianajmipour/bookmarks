@@ -225,8 +225,20 @@ class Reporter:
         FA( Paragraph(' Real Estate Appraisers & Consultants \n \n', self.style_header2) )
         FA( Paragraph('page 2', self.style_left_small) )
         FA( Paragraph('Reference No. ' + self.report.ref_code, self.style_left_small) )
-        FA( Paragraph(self.report.report_date.strftime('%b %d, %Y'), self.style_left_small) )
-
+        FA( Paragraph(self.report.report_date.strftime('%b %d, %Y') + '<br/><br/>', self.style_left_small) )
+        
+        FA( Paragraph('''We have prepared this report for you and your associates. It is not to be reproduced, in whole or in part,
+without the written consent of the undersigned. Neither our name nor the material submitted may be
+included in any prospectus, newspaper publicity or as part of any printed material, or used in offerings or
+representations in connection with the sale of securities or participation interests to the public, without our
+prior written consent. The report is only valid if it bears the original signature of the author.''', self.style_left_context_spaceAfter) )
+        FA( Paragraph('''Our report providing details of the property and our method of valuation is attached. If we can be of further
+assistance in these or other matters, please do not hesitate to contact us.''', self.style_left_context_spaceAfter) )
+        FA( Paragraph('''Yours truly,''', self.style_left_context_spaceAfter) )
+        
+        FA( Paragraph('<b>JUTEAU JOHNSON COMBA INC</b>', self.style_left_context) )
+        FA( Paragraph('picture', self.style_left_context) )
+        FA( Paragraph('Tania J. McDonald, B.A., AACI, P.App.', self.style_left_context) )
         FA(PageBreak())
 
 
