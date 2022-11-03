@@ -3,6 +3,8 @@
 {% block title %}Welcome{% endblock %}
 
 {% block content %}
+<div class="col-md-6  px-5 py-5  justify-content-center  text-secondary">
   <h1>Welcome {{ new_user.first_name }}!</h1>
   <p>Your account has been successfully created. Now you can <a href="{% url 'login' %}">log in</a>.</p>
+</div>
 {% endblock %}
