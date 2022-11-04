@@ -5,6 +5,7 @@ from reportlab.lib.colors import yellow, green, red, black, gray
 from reportlab.lib.units import inch
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import Paragraph, PageBreak
+from reportlab.platypus.flowables import Flowable, DocAssert
 from reportlab.platypus import ListFlowable, ListItem, Table, TableStyle, Frame, NextPageTemplate, PageTemplate
 from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT, TA_JUSTIFY
 from copy import copy, deepcopy
@@ -13,6 +14,27 @@ import logging
 import sys
 
 logger = logging.getLogger(__name__)
+
+class MyDocTemplate(SimpleDocTemplate):
+    def __init__(self, filename, reporter, **kw):
+        super().__init__(filename, **kw)
+        self._reporter = reporter
+    def afterPage(self):
+        # logger.error(self.pageTemplate.id)
+        currPageTemplate = self.pageTemplate.id
+        # if currPageTemplate != None:
+        # logger.error(self._reporter.flowables[-1].action[1])
+        self._reporter.setTemplateToNextPage(self.pageTemplate.id)
+        # self._reporter.setTemplateToNextPage("salam")
+        if self.page in (1,2,3):
+            # logger.error(self._reporter.flowables[-1].action[1])
+            logger.error(currPageTemplate)
+        # logger.error(self._reporter.flowables[0])
+        # logger.error(currPageTemplate)
+        # for i in self._reporter.flowables:
+        #     logger.error(i)
+        
+        
 
 class Reporter:
     
@@ -24,13 +46,14 @@ class Reporter:
         self.flowables = []
         self.report = report
         self.buffer = io.BytesIO()
-        self.template = SimpleDocTemplate(
+        self.template = MyDocTemplate(
             self.buffer,
             pagesize=letter,
             topMargin=inch,
             leftMargin=0.9*inch,
             rightMargin=0.64*inch,
-            bottomMargin=0.75*inch
+            bottomMargin=0.75*inch,
+            reporter=self
         )
 
 
@@ -226,10 +249,13 @@ class Reporter:
             
         self.template.addPageTemplates([
             PageTemplate(id='intro', frames=frameT),
-            PageTemplate(id='main', frames=frameT, onPage=makeHeaderFooterMain)
+            PageTemplate(id='main', frames=frameT, onPageEnd=makeHeaderFooterMain)
         ])
-        logger.error(self.template.pageTemplates[0].onPage)
+        # logger.error(self.template.pageTemplates[0].autoNextPageTemplate)
         # print >>sys.stderr, "self.template.pageTemplates"
+
+    def insertIntoFlowables(self, index, flowable):
+        self.flowables.insert(index, flowable)
 
     def createTemplate(self):
 
@@ -254,6 +280,9 @@ class Reporter:
         # page_number = int(page_number)
 
         # if page_number == 1:
+        # self.setTemplateToNextPage('intro')
+        # FA(DocAssert('doc.pageTemplate.id=="intro"','expected doc.pageTemplate.id=="main"'))
+        
         
         #/////////////////////////////////// page 1 ///////////////////////////////////////////////////////
         FA( Paragraph('Juteau Johnson Comba Inc', self.style_header1) )
@@ -325,6 +354,11 @@ class Reporter:
 
         FA(PageBreak())
         #/////////////////////////////////// page 3 /////////////////////////////////////////////////////////
+        # FA(DocAssert('doc.pageTemplate.id=="intro"','expected doc.pageTemplate.id=="main"'))
+        
+        # FA(DocAssert('doc.pageTemplate.id=="introtrbtg"','expected doc.pageTemplate.id=="main"'))
+        # logger.error(self.template.docEval('doc.pageTemplate'))
+        
         FA( Paragraph('Juteau Johnson Comba Inc', self.style_header1) )
         FA( Paragraph(' Real Estate Appraisers & Consultants \n \n', self.style_header2) )
         FA( Paragraph('page 2', self.style_left_small) )
@@ -349,11 +383,13 @@ assistance in these or other matters, please do not hesitate to contact us.''', 
         #/////////////////////////////////// page 4 /////////////////////////////////////////////////////////
         FA( Paragraph("AERIAL PHOTOGRAPH OF SUBJECT PROPERTY", self.style_title) )
 
-        self.setTemplateToNextPage('main')
         FA(PageBreak())
         
         #/////////////////////////////////// page 5 /////////////////////////////////////////////////////////
+        self.setTemplateToNextPage('main')
+        FA(PageBreak())
         #/////////////////////////////////// page 6 & 7 /////////////////////////////////////////////////////////
+        
         style_title2 = deepcopy(self.style_title)
         style_title2.borderPadding = (100,100,100)
         FA( Paragraph("SUMMARY OF SALIENT FACTS AND IMPORTANT CONCLUSIONS", style_title2) )
