@@ -9,6 +9,10 @@ from reportlab.platypus import ListFlowable, ListItem, Table, TableStyle, Frame,
 from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT, TA_JUSTIFY
 from copy import copy, deepcopy
 from django.http import FileResponse
+import logging
+import sys
+
+logger = logging.getLogger(__name__)
 
 class Reporter:
     
@@ -26,7 +30,7 @@ class Reporter:
             topMargin=inch,
             leftMargin=0.9*inch,
             rightMargin=0.64*inch,
-            bottomMargin=0.4*inch
+            bottomMargin=0.75*inch
         )
 
 
@@ -72,11 +76,12 @@ class Reporter:
         self.style_contactus.leading = 12
         self.style_contactus.textColor = '#043475'
         self.style_contactus.rightIndent = -280
-        self.style_contactus.spaceBefore = 150
+        self.style_contactus.spaceBefore = 130
 
         self.style_contactus2 = deepcopy(self.style_contactus)
         self.style_contactus2.fontSize = 10
         self.style_contactus2.spaceBefore = 0
+        self.style_contactus2.spaceAfter = 0
 
         self.style_right_small = deepcopy(self.style_right_big)
         self.style_right_small.fontSize = 12
@@ -147,8 +152,8 @@ class Reporter:
             canvas.saveState()
             textobject = canvas.beginText()
             textobject.setTextOrigin(
-                doc.leftMargin + 0.1*inch,
-                doc.height + doc.bottomMargin + 0.4*inch,
+                doc.leftMargin + 0.11*doc.leftMargin,
+                doc.height + doc.bottomMargin + 0.405*inch,
             )
             textobject.setFont("Times-Roman", 10)
             textobject.setFillGray(0.5)
@@ -160,26 +165,68 @@ class Reporter:
 
 
             canvas.drawString(
-                doc.leftMargin + doc.width - 0.1*inch,
+                doc.leftMargin + doc.width - 0.12*inch,
                 doc.height + doc.bottomMargin + 0.3*inch,
                 "%d" % canvas.getPageNumber()
             )
 
             canvas.setStrokeColor(gray)
             p = canvas.beginPath()
-            p.moveTo(doc.leftMargin + 0.1*inch, doc.height + doc.bottomMargin + 0.2*inch)
-            p.lineTo(doc.leftMargin + doc.width, doc.height + doc.bottomMargin + 0.2*inch)
+            p.moveTo(doc.leftMargin + 0.11*doc.leftMargin, doc.height + doc.bottomMargin + 0.2*inch)
+            p.lineTo(doc.leftMargin + doc.width - 0.07*inch, doc.height + doc.bottomMargin + 0.2*inch)
             p.close()
             canvas.drawPath(p)
-            # canvas.drawString(inch, 0.75 * inch, "Page %d" % doc.page)
-            # canvas.drawString(
-            #     self.template.leftMargin,
-            #     self.template.height + self.template.bottomMargin + 0.5*inch,
-            #     '''11966685 Canada Inc Appraisal Report on 1368 Labrie Avenue, Ottawa, Ontario '''
-            # )
+            
+            canvas.setStrokeColor(gray)
+            p = canvas.beginPath()
+            p.moveTo(doc.leftMargin + 0.1*inch, 0.9*doc.bottomMargin)
+            p.lineTo(doc.leftMargin + doc.width - 0.07*inch, 0.9*doc.bottomMargin)
+            p.close()
+            canvas.drawPath(p)
+            
+            textobject = canvas.beginText()
+            textobject.setTextOrigin(
+                doc.leftMargin + 0.1*inch,
+                0.7*doc.bottomMargin,
+            )
+            textobject.setFont("Times-Roman", 10)
+            textobject.setFillGray(0.5)
+            textobject.textLine('Juteau Johnson Comba Inc.')
+            canvas.drawText(textobject)
+            
+            def stringWidth2(string, font, size):
+                spaces_count = 0
+                for char in string:
+                    if char.isspace():
+                        spaces_count += 1
+                width = canvas.stringWidth(string, font, size)
+                width += spaces_count
+                return width
+            textobject = canvas.beginText()
+            string = '104-22-31'
+            # string = '.'
+            font = 'Times-Roman'
+            font_size = 10
+            
+            textobject.setTextOrigin(
+                doc.leftMargin + doc.width - canvas.stringWidth(string, font, font_size) - 0.06*inch,
+                # doc.leftMargin + doc.width + doc.rightMargin,
+                
+                0.7*doc.bottomMargin,
+            )
+            textobject.setFont(font, font_size)
+            textobject.setFillGray(0.5)
+            textobject.textLine(string)
+            canvas.drawText(textobject)
+            
             canvas.restoreState()
-        self.template.addPageTemplates([PageTemplate(id='main', frames=frameT, onPage=makeHeaderFooterMain)])
-        
+            
+        self.template.addPageTemplates([
+            PageTemplate(id='intro', frames=frameT),
+            PageTemplate(id='main', frames=frameT, onPage=makeHeaderFooterMain)
+        ])
+        logger.error(self.template.pageTemplates[0].onPage)
+        # print >>sys.stderr, "self.template.pageTemplates"
 
     def createTemplate(self):
 
@@ -195,7 +242,7 @@ class Reporter:
         self.buffer.seek(0)
         return FileResponse(self.buffer, as_attachment=True, filename='hello.pdf')
 
-    def addTemplateToNextPage(self, template_id):
+    def setTemplateToNextPage(self, template_id):
         self.flowables.append(NextPageTemplate(template_id))
 
 
@@ -287,7 +334,7 @@ class Reporter:
         #/////////////////////////////////// page 4 /////////////////////////////////////////////////////////
         FA( Paragraph("AERIAL PHOTOGRAPH OF SUBJECT PROPERTY", self.style_title) )
 
-        self.addTemplateToNextPage('main')
+        self.setTemplateToNextPage('main')
         FA(PageBreak())
         
         #/////////////////////////////////// page 5 /////////////////////////////////////////////////////////
