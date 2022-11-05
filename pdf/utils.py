@@ -34,7 +34,6 @@ class MyDocTemplate(SimpleDocTemplate):
         # for i in self._reporter.flowables:
         #     logger.error(i)
         
-        
 
 class Reporter:
     
