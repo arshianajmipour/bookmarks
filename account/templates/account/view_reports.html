@@ -9,19 +9,28 @@
   <table class="table">
     <thead>
       <tr>
-        <td>client_name</td>
+        <td>client</td>
         <td>pdf file</td>
-        <td>effective date</td>
+        
         <td>report date</td>
+        <td></td>
       </tr>
     </thead>
     <tbody>
       {% for report in reports %}
         <tr>
           <td>{{report.client_name}}</td>
-          <td><a href="/pdf/get_pdf3/{{report.id}}">download the pdf</a></td>
-          <td>{{report.effective_date}}</td>
+          <td><a href="/pdf/get_pdf3/{{report.id}}">download the pdf
+            <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+          </a></td>
+          
           <td>{{report.report_date}}</td>
+          <td>
+            <a href="/delete/report/{{report.id}}" class="btn btn-danger" 
+            onclick="return confirm('Are you sure you want to delete this?')">
+              <i class="fa fa-trash" aria-hidden="true"></i>
+            </a>
+          </td>
         </tr>
       {% endfor %}
     </tbody>

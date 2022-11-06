@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
 
 
 class Profile(models.Model):
@@ -42,5 +43,4 @@ class Report(models.Model):
                                                verbose_name='Radio Button Feature')
     receive_newsletter = models.BooleanField(null=True, blank=False, verbose_name='Receive NewsLetter')
     fpdf = models.FileField(upload_to='reports/%Y/%m/%d/',null=True, blank=False, verbose_name='Report File')
-
     
