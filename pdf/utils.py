@@ -59,7 +59,7 @@ class Reporter:
         ################################## Paragraph Styles #################################################
         self.styleN = Reporter.styles['Normal']
         self.styleN.fontName = 'Times-Roman'
-        self.styleN.fontSize = 11.5
+        self.styleN.fontSize = 11.7
         self.styleN.leading = 14
         self.styleN.alignment = TA_JUSTIFY
         self.styleN.justifyBreaks = 1
@@ -117,10 +117,10 @@ class Reporter:
         self.style_left_titr.spaceBefore = 10
 
         self.style_left_context = deepcopy(self.style_left_titr)
-        self.style_left_context.fontSize = 11.5
         self.style_left_context.leading = 14
         self.style_left_context.alignment = TA_JUSTIFY
         self.style_left_context.justifyBreaks = 1
+        self.style_left_context.spaceBefore = 10
 
         self.style_left_context_spaceAfter = deepcopy(self.style_left_context)
         self.style_left_context_spaceAfter.spaceAfter = 15
@@ -134,6 +134,9 @@ class Reporter:
         self.style_left_listitem = deepcopy(self.style_left_context)
         self.style_left_listitem.spaceBefore = 0
         self.style_left_listitem.alignment = TA_LEFT
+
+        self.style_center_context_spaceAfter = deepcopy(self.style_left_context_spaceAfter)
+        self.style_center_context_spaceAfter.alignment = TA_CENTER
 
         self.style_contactus_small_center = deepcopy(self.style_contactus)
         self.style_contactus_small_center.fontSize = 10
@@ -274,6 +277,54 @@ class Reporter:
         self.flowables.append(NextPageTemplate(template_id))
 
 
+    def insertParagraphWithTitle(self, title, context, style_title=None, style_context=None):
+        if style_title == None:
+            style_title = self.style_left_context_spaceAfter
+        if style_context == None:
+            style_context = self.style_left_context_spaceAfter
+
+        FA = self.flowables.append
+
+        FA( Paragraph('<b>' + title + '</b>', style_title) )
+        FA( Paragraph(context, style_context) )
+
+    def insertParagraph(self, context, style_context=None):
+        if style_context == None:
+            style_context = self.style_left_context_spaceAfter
+        FA = self.flowables.append
+        FA( Paragraph(context, style_context) )
+
+    def insertKeyContextTable(self, *tuples, style_key=None, style_context=None, style_table=None):
+        FA = self.flowables.append
+        if style_key == None:
+            style_key = self.style_left_context
+        if style_context == None:
+            style_context = self.style_left_context
+        data = []
+        # logger.error(len(args))
+        # for i in range(0, len(args), 2):
+        for tuplee in tuples:
+            if tuplee[0] == 'Frontage':
+                style_context = deepcopy(style_context)
+                style_context.alignment = TA_LEFT
+            # elif style_context == self.style_left_context:
+            else:
+                style_context = self.style_left_context
+            data.append([Paragraph(tuplee[0] + ':', style_key), Paragraph(tuplee[1], style_context)])
+
+        table = Table(data, colWidths=[self.template.width * 2 / 5, self.template.width * 3 / 5])
+        if style_table != None:
+            table.setStyle(style_table)
+        FA( table )
+
+    def insertQoute(self, context, left_indent=None):
+        style = deepcopy(self.style_left_context_indent20)
+        if left_indent != None:
+            style.leftIndent = left_indent
+
+        FA = self.flowables.append
+        FA(Paragraph('<I>' + context + '</I>', style))
+
     def createPage(self):
         FA = self.flowables.append
         # page_number = int(page_number)
@@ -395,77 +446,125 @@ assistance in these or other matters, please do not hesitate to contact us.''', 
 
         FA( Paragraph("<b>TERMS OF REFERENCE</b>", self.style_left_titr) )
 
-        data = [[Paragraph('Purpose of Appraisal:', self.style_left_context),
-                Paragraph('''To estimate the current market value of the fee simple interest
+#         data = [[Paragraph('Purpose of Appraisal:', self.style_left_context),
+#                 Paragraph('''To estimate the current market value of the fee simple interest
+#  in the subject site based on its highest and best use. Our value
+#  estimate is free and clear of mortgage or other encumbrances,
+#  unless otherwise indicated, and is subject to any assumptions
+#  and limiting conditions outlined herein.''', self.style_left_context)],
+#                 [Paragraph('Intended Use & User of Appraisal:', self.style_left_context),
+#                 Paragraph('''To assist the client in estimating the current market value of the
+# subject parcel for mortgage financing purposes. All other uses
+# are denied. The intended user ofthe report is 11966685 Canada
+# Inc. only. All other users and/or parties are denied without
+# written authorization to use this report from Juteau Johnson
+# Comba Inc.
+# ''', self.style_left_context)],
+#                 [Paragraph('Effective Date of Appraisal: ', self.style_left_context),
+#                 Paragraph(self.report.effective_date.strftime('%b %d, %Y'), self.style_left_context)],
+#                 [Paragraph('Date of Inspection: ', self.style_left_context),
+#                 Paragraph(self.report.effective_date.strftime('%b %d, %Y'), self.style_left_context)]]
+
+#         table = Table(data, colWidths=[self.template.width * 2 / 5, self.template.width * 3 / 5])
+#         FA( table )
+
+        self.insertKeyContextTable(
+            ('Purpose of Appraisal', '''To estimate the current market value of the fee simple interest
  in the subject site based on its highest and best use. Our value
  estimate is free and clear of mortgage or other encumbrances,
  unless otherwise indicated, and is subject to any assumptions
- and limiting conditions outlined herein.''', self.style_left_context)],
-                [Paragraph('Intended Use & User of Appraisal:', self.style_left_context),
-                Paragraph('''To assist the client in estimating the current market value of the
+ and limiting conditions outlined herein.'''),
+            ('Intended Use & User of Appraisal', '''To assist the client in estimating the current market value of the
 subject parcel for mortgage financing purposes. All other uses
 are denied. The intended user ofthe report is 11966685 Canada
 Inc. only. All other users and/or parties are denied without
 written authorization to use this report from Juteau Johnson
-Comba Inc.
-''', self.style_left_context)],
-                [Paragraph('Effective Date of Appraisal: ', self.style_left_context),
-                Paragraph(self.report.effective_date.strftime('%b %d, %Y'), self.style_left_context)],
-                [Paragraph('Date of Inspection: ', self.style_left_context),
-                Paragraph(self.report.effective_date.strftime('%b %d, %Y'), self.style_left_context)]]
-
-        table = Table(data, colWidths=[self.template.width * 2 / 5, self.template.width * 3 / 5])
-        FA( table )
+Comba Inc.'''),
+            ('Effective Date of Appraisal', self.report.effective_date.strftime('%b %d, %Y')),
+            ('Date of Inspection', self.report.effective_date.strftime('%b %d, %Y'))
+        )
 
 
         FA(Paragraph('<b>PHYSICAL DATA</b>', self.style_left_titr))
 
-        data = [[Paragraph('Location:', self.style_left_context),
-                Paragraph('''The subject property is located on the west side of Labrie
+#         data = [[Paragraph('Location:', self.style_left_context),
+#                 Paragraph('''The subject property is located on the west side of Labrie
+#                     Avenue, to the south of Cyrville Road, in theCyrville Industrial
+#                     Area, in the east end of the City of Ottawa.''', self.style_left_context)],
+#                 [Paragraph('Municipal Address:', self.style_left_context),
+#                 Paragraph('''1368 Labrie Avenue, Ottawa, Ontario''', self.style_left_context)],
+#                 [Paragraph('Legal Description:', self.style_left_context),
+#                 Paragraph('''The subject property is identified in the Land Registry Office as
+#                     Part of Lot 25, Concession 2, Ottawa Front; designated as Part
+#                     1 on Plan 4R-11032; in the former City of Gloucester, now in
+#                     the City of Ottawa. PIN 04263-0224.''', self.style_left_context)],
+#                 [Paragraph('Site Area:', self.style_left_context),
+#                 Paragraph('14,962 square feet', self.style_left_context)],
+#                 [Paragraph('Zoning:', self.style_left_context),
+#                 Paragraph('''The property recently received a zoning by-law amendment to
+# TD1[2755] - Transit Oriented Development Zone. A copy of
+# the Final Letter of Enactment is attached in the addendum of
+# this report.''', self.style_left_context)],
+#                 [Paragraph('Current Improvements:', self.style_left_context),
+#                 Paragraph('''The property is currently improved with an older two-storey
+# residential building that is demised into three rental apartment
+# units.There is a detached garage convertedintooffice space and
+# a fully enclosed rear yard.''', self.style_left_context)],
+#                 [Paragraph('Proposed Development:', self.style_left_context),
+#                 Paragraph('''The client is proposing to develop the property with a six-storey,
+# 45-unit apartment building.''', self.style_left_context)],
+#                 [Paragraph('Highest and Best Use:', self.style_left_context),
+#                 Paragraph('''Redevelopment of the property with the proposed residential
+# apartment use.''', self.style_left_context)]]
+#         table = Table(data, colWidths=[self.template.width * 2 / 5, self.template.width * 3 / 5])
+#         FA( table )
+
+        self.insertKeyContextTable(
+            ('Location', '''The subject property is located on the west side of Labrie
                     Avenue, to the south of Cyrville Road, in theCyrville Industrial
-                    Area, in the east end of the City of Ottawa.''', self.style_left_context)],
-                [Paragraph('Municipal Address:', self.style_left_context),
-                Paragraph('''1368 Labrie Avenue, Ottawa, Ontario''', self.style_left_context)],
-                [Paragraph('Legal Description:', self.style_left_context),
-                Paragraph('''The subject property is identified in the Land Registry Office as
+                    Area, in the east end of the City of Ottawa.'''),
+            ('Municipal Address', '''1368 Labrie Avenue, Ottawa, Ontario'''),
+            ('Legal Description', '''The subject property is identified in the Land Registry Office as
                     Part of Lot 25, Concession 2, Ottawa Front; designated as Part
                     1 on Plan 4R-11032; in the former City of Gloucester, now in
-                    the City of Ottawa. PIN 04263-0224.''', self.style_left_context)],
-                [Paragraph('Site Area:', self.style_left_context),
-                Paragraph('14,962 square feet', self.style_left_context)],
-                [Paragraph('Zoning:', self.style_left_context),
-                Paragraph('''The property recently received a zoning by-law amendment to
+                    the City of Ottawa. PIN 04263-0224.'''),
+            ('Site Area', '14,962 square feet'),
+            ('Zoning', '''The property recently received a zoning by-law amendment to
 TD1[2755] - Transit Oriented Development Zone. A copy of
 the Final Letter of Enactment is attached in the addendum of
-this report.''', self.style_left_context)],
-                [Paragraph('Current Improvements:', self.style_left_context),
-                Paragraph('''The property is currently improved with an older two-storey
+this report.'''),
+            ('Current Improvements', '''The property is currently improved with an older two-storey
 residential building that is demised into three rental apartment
 units.There is a detached garage convertedintooffice space and
-a fully enclosed rear yard.''', self.style_left_context)],
-                [Paragraph('Proposed Development:', self.style_left_context),
-                Paragraph('''The client is proposing to develop the property with a six-storey,
-45-unit apartment building.''', self.style_left_context)],
-                [Paragraph('Highest and Best Use:', self.style_left_context),
-                Paragraph('''Redevelopment of the property with the proposed residential
-apartment use.''', self.style_left_context)]]
-        table = Table(data, colWidths=[self.template.width * 2 / 5, self.template.width * 3 / 5])
-        FA( table )
+a fully enclosed rear yard.'''),
+            ('Proposed Development', '''The client is proposing to develop the property with a six-storey,
+45-unit apartment building.'''),
+            ('Highest and Best Use', '''Redevelopment of the property with the proposed residential
+apartment use.'''),
+        )
 
         FA(Paragraph('<b>VALUATION PARAMETERS</b>', self.style_left_titr))
 
 
-        # style_left_
-        data = [[Paragraph('Total Site Area:', self.style_left_context_indent12),
-                Paragraph('''14,962 square feet''', self.style_left_context)],
-                [Paragraph('Price Per Sq. Ft.:', self.style_left_context_indent12),
-                Paragraph('''$135.00''', self.style_left_context)],
-                [Paragraph('<b>Market Value Estimate:</b>', self.style_left_context_indent12),
-                Paragraph('''<b>$2,020,000</b>''', self.style_left_context)],
-                ]
-        table = Table(data, colWidths=[self.template.width * 2 / 5, self.template.width * 3 / 5])
-        table.setStyle(self.table_style_padding_small)
-        FA( table )
+        # data = [[Paragraph('Total Site Area:', self.style_left_context_indent12),
+        #         Paragraph('''14,962 square feet''', self.style_left_context)],
+        #         [Paragraph('Price Per Sq. Ft.:', self.style_left_context_indent12),
+        #         Paragraph('''$135.00''', self.style_left_context)],
+        #         [Paragraph('<b>Market Value Estimate:</b>', self.style_left_context_indent12),
+        #         Paragraph('''<b>$2,020,000</b>''', self.style_left_context)],
+        #         ]
+        # table = Table(data, colWidths=[self.template.width * 2 / 5, self.template.width * 3 / 5])
+        # table.setStyle(self.table_style_padding_small)
+        # FA( table )
+
+        self.insertKeyContextTable(
+            ('Total Site Area', '''14,962 square feet'''),
+            ('Price Per Sq. Ft.', '''$135.00'''),
+            ('<b>Market Value Estimate:</b>', '''<b>$2,020,000</b>'''),
+            style_key=self.style_left_context_indent12,
+            style_context=self.style_left_context,
+            style_table=self.table_style_padding_small
+        )
 
         FA( PageBreak() )
 
@@ -516,7 +615,7 @@ Further, it is assumed that soils are suitable to support development.
 ''', self.style_left_context_spaceAfter ) )
 
         FA(PageBreak())
-    #///////////////////////////////////////// page9 //////////////////////////////////////////////////////
+    #///////////////////////////////////////// page 9 & 10 //////////////////////////////////////////////////////
         FA(Paragraph('TERMS OF REFERENCE',self.style_title))
         FA(Paragraph('<B>Purpose of Appraisal</B>',self.style_left_titr))
         FA(Paragraph('''The purpose of this appraisal is to estimate the current market value of the fee simple interest in the
@@ -545,15 +644,23 @@ other encumbrances, unless otherwise indicated, and are subject to the following
             ''' , self.style_left_context_spaceAfter))
         FA(Paragraph('<B>Definition of Market Value</B>',self.style_left_titr))
         FA(Paragraph('For the purpose of this appraisal, market value is defined as:',self.style_left_context_spaceAfter))
-        FA(Paragraph('''<I>The most probable price, as of a specified date, in cash, or in terms equivalent to cash, or in
+        # FA(Paragraph('''<I>The most probable price, as of a specified date, in cash, or in terms equivalent to cash, or in
+        #     other precisely revealed terms, for which the specified property rights should sell after
+        #     reasonable exposure in a competitive market under all conditions requisite to a fair sale, with
+        #     the buyer and the seller each acting prudently, knowledgeable, and for self-interest, assuming
+        #     that neither is under duress.</I>
+        #     ''',self.style_left_context_indent20))
+        self.insertQoute('''The most probable price, as of a specified date, in cash, or in terms equivalent to cash, or in
             other precisely revealed terms, for which the specified property rights should sell after
             reasonable exposure in a competitive market under all conditions requisite to a fair sale, with
             the buyer and the seller each acting prudently, knowledgeable, and for self-interest, assuming
-            that neither is under duress.</I>
-            ''',self.style_left_context_indent20))
+            that neither is under duress.
+            ''')
         FA(Paragraph('<B>Definition of Exposure Time</B>',self.style_left_titr))
-        FA(Paragraph('''<I>Exposure time, as per the Canadian Uniform Standards of Professional Appraisal Practice (CUSPAP)
-            dated January 1, 2022, may be defined as follows:</I>''',self.style_left_context_indent20))
+        # FA(Paragraph('''<I>Exposure time, as per the Canadian Uniform Standards of Professional Appraisal Practice (CUSPAP)
+        #     dated January 1, 2022, may be defined as follows:</I>''',self.style_left_context_indent20))
+        self.insertQoute('''Exposure time, as per the Canadian Uniform Standards of Professional Appraisal Practice (CUSPAP)
+            dated January 1, 2022, may be defined as follows:''')
         FA(Paragraph('''Exposure time is differentfor varioustypes ofreal estate and under variousmarket conditions. Itshould
             be noted that the overall concept of reasonable exposure encompasses not only adequate,sufficient and
             reasonable time but also adequate, sufficient and reasonable effort.''',self.style_left_context_spaceAfter)
@@ -562,21 +669,298 @@ other encumbrances, unless otherwise indicated, and are subject to the following
         FA(Paragraph('<B>Property Rights Under Appraisal</B>',self.style_left_titr))
         FA(Paragraph('''The property ownership right under appraisal is that of the fee simple interest in the subject property.
             Fee simple interest is defined as:''',self.style_left_context_spaceAfter))
-        FA(Paragraph('''<I>“...absolute ownership of property unencumbered by any other interest or estate and subject
-            only to the powers of government.”
-            </I>''',self.style_left_context_indent20))
+        # FA(Paragraph('''<I>“...absolute ownership of property unencumbered by any other interest or estate and subject
+        #     only to the powers of government.”
+        #     </I>''',self.style_left_context_indent20))
+        self.insertQoute('''“...absolute ownership of property unencumbered by any other interest or estate and subject
+            only to the powers of government.”''')
         FA(Paragraph('<B>Effective Date of Appraisal</B>',self.style_left_titr))
         FA(Paragraph('The effective date of appraisal is'+self.report.effective_date.strftime('%b %d, %Y')
-        ,self.style_left_context_spaceAfter))
+            ,self.style_left_context_spaceAfter))
         FA(Paragraph('<B>Date of Inspection</B>',self.style_left_titr))
         FA(Paragraph('''Inspection, as per theCanadian UniformStandards of Professional Appraisal Practice (CUSPAP) dated'''+
-        self.report.report_date.strftime('%b %d, %Y')+'may be defined as follows:',self.style_left_context_spaceAfter))
-        FA(Paragraph('''<I>“An observation, site visit, walk through, viewing or non-invasive visual examination
-            of a property.”</I>
-            ''',self.style_left_context_indent20))
+            self.report.report_date.strftime('%b %d, %Y')+'may be defined as follows:',self.style_left_context_spaceAfter))
+        # FA(Paragraph('''<I>“An observation, site visit, walk through, viewing or non-invasive visual examination
+        #     of a property.”</I>
+        #     ''',self.style_left_context_indent20))
+        self.insertQoute('''“An observation, site visit, walk through, viewing or non-invasive visual examination
+            of a property.”''')
         FA(Paragraph('A drive-by inspection of the subject property was undertaken on'+
-        self.report.effective_date.strftime('%b %d, %Y'),self.style_left_context_spaceAfter))
+            self.report.effective_date.strftime('%b %d, %Y'),self.style_left_context_spaceAfter))
         FA(PageBreak())
 
+
+    #///////////////////////////////////////// page 11 //////////////////////////////////////////////////////
+        FA( Paragraph('PROPERTY IDENTIFICATION', self.style_title) )
+
+        self.insertParagraphWithTitle('Location', '''The subject site is located on the west side of Labrie Avenue, to the south of Cyrville Road, in the Cyrville Industrial Park, in the east end of the City of Ottawa.''')
+
+        self.insertParagraphWithTitle('Municipal Address', '''The subject's municipal address is 1368 Labrie Avenue, Ottawa, Ontario.''')
+
+        self.insertParagraphWithTitle('Legal Description', '''The subject property is legally described as Part of Lot 25, Concession 2, Ottawa Front; designated as
+Part 1 on Plan 4R-11032; in the former City of Gloucester, now in the City of Ottawa. It is identified
+in the Land Registry Office under PIN 04263-0224.''')
+
+        FA( Paragraph('''The foregoing legal description wastaken from GeoWarehouse (an on-line service providing accessto
+land registry data and updated regularly from the POLARIS data base - the automated land records
+management system for the Province of Ontario). It is assumed to be correct, however, should not be
+relied uponas accuratewithout obtaininga qualified legal opinion. We havemade noinvestigationsinto
+the title of the property. Further, any documentsregistered on title have not been read. Thisreport has
+been prepared on the premise that the property is free and clear of all liens and encumbrances, unless
+otherwise indicated, and on the assumption that the improvements do not encroach on any adjoining
+lands.''', self.style_left_context_spaceAfter) )
+
+        self.insertParagraphWithTitle('Ownership and Three Year Sales History', '''Based on a search ofthe Geowarehouse web site, the subject propertywaslast transferred on September
+4, 2020 to 11966685 Canada Inc. from Jamal and IbrahimBaroud for a consideration of $760,000. We
+are not aware of any listings, offers or agreements of purchase and sale affecting the property over the
+past three years''')
+
+        self.insertParagraphWithTitle('Assessment and Taxes', '''Based upon theCity of Ottawa tax bill provided by the client, realty taxes were $3,495.65 in 2021 based
+on an assessment of $536,000. Ontario’s planned reassessment for the 2021-2024 assessment cycle
+based on 2019 values has been delayed for a second year due to the Covid-19 Pandemic. Assessments
+for 2022 will continue to be based on the current 2016 value''')
+
+        FA( PageBreak() )
+
+    #///////////////////////////////////////// page 12 //////////////////////////////////////////////////////
+        FA( Paragraph('LOCATION MAP', self.style_title) )
+
+        FA( PageBreak() )
+    #///////////////////////////////////////// page 13, 14, 15 //////////////////////////////////////////////////////
+    #///////////////////////////////////////// page 16, 17, 18, 19, 20, 21, 22 //////////////////////////////////////////////////////
+    #///////////////////////////////////////// page 23 //////////////////////////////////////////////////////
+        FA( Paragraph('SITE DATA<br/>', self.style_title) )
+
+        self.insertKeyContextTable(
+            ('Location', '''West side of Labrie Avenue, to the south of Cyrville Road, in
+the Cyrville Industrial Area in the east nd of the City of Ottawa.'''),
+            ('Configuration', 'The subject site has a rectangular configuration.'),
+            ('Frontage', '''- 100.64 feet of frontage along the west side of Labrie Avenue;<br/>\
+- 148.85 feet along the southern boundary;<br/>\
+- 101.02 feet along the western boundary; and<br/>\
+- 148.43 feet along the northern boundary'''),
+            ('Site Area', '14,962 square feet'),
+            ('Topography', 'The overall site has a slight upward slope from the road grade.'),
+            ('Access', '''Vehicular access is available via two points of ingress/egress
+from the west side of Labrie Avenue.'''),
+            ('Site Services', '''Full municipal services are available to the subject site
+including water, hydro, telephone, gas and sanitary sewers.'''),
+            ('Site Improvements', '''The front yard is sodded. An older asphalt driveway and
+parking area are located in the southeastern portion of the site.
+A compact gravel driveway is located along the northern
+elevation of the building. The rear yard comprises a fully
+fenced compact gravel storage area that is leased.'''),
+            ('Soil Conditions', '''No soil tests were completed in conjunction with thisreport. It
+is assumed that soils are suitable to support the existing
+improvements.'''),
+            ('Environmental Concerns', '''Our report assumes that the property is free of environmental
+contaminates or hazardous substances (including mould).
+However, it should be clearly understood that we are not
+qualified to detect, test for, investigate, or otherwise ascertain
+the existence of such substances. As such, we do not assume
+any responsibility for their existence or any costs associated
+with their removal, correction, or treatment in the event that
+they are found to exist on the subject property or on adjacent
+lands.'''),
+        )
         
+        FA( PageBreak() )
+
+    #///////////////////////////////////////// page 24 //////////////////////////////////////////////////////
+        FA( Paragraph('ZONING MAP', self.style_title) )
+
+        FA( PageBreak() )
+
+    #///////////////////////////////////////// page 25 //////////////////////////////////////////////////////
+        FA( Paragraph('LAND USE REGULATIONS', self.style_title) )
+        self.insertParagraph('''The subject property recently received a zoning by-law amendment from a Light Industrial Zone to a
+TD1[2755] - h - Transit Oriented Development Zone. A copy of the Final Letter of Enactment is
+attached in the addendumofthisreport. In accordance with theCityof Ottawa’s comprehensive zoning
+by-law (2008-250) that was approved by City Council on June 25, 2008, the purpose of the Transit
+Oriented Development is to:''')
         
+        self.insertQoute('''(1) Establish minimum density targets needed to support Light Rail Transit (LRT) use for
+lands within Council approved Transit Oriented Development Plan areas;<br/><br/>\
+(2) Accommodate a wide range of transit-supportive land uses such as residential, office,
+commercial, retail, arts and culture, entertainment, service and institutional uses in a
+compact pedestrian-oriented built form at medium to high densities;<br/><br/>\
+(3) Locate higher densitiesin proximity toLRTstationsto create focal points of activity and
+promote the use of multiple modes of transportation; and,<br/><br/>\
+(4) Impose development standards that ensure the development of attractive urban
+environments that exhibit high-quality urban design and that establish priority streets
+for active use frontages and streetscaping investment.''', 40)
+
+        self.insertParagraph('''The TD zone permits a variety of non-residential usesincluding a bank, bar, cinema, community centre,
+diplomatic mission, court house, group home, hospital, hotel, instructional facility, library, medical
+facility, museum, nightclub, office, place of assembly, post office, post-secondary educational
+institution, production studio, recreational or athletic facility, research and development centre,
+residential care facility, restaurant, retail store, school, service and repair shop, shelter, sports arena,
+technology industry, theatre, training centre, parking garage (subject to being in the same building or on
+the same lot as a use or uses listed above), among others.''')
+        self.insertParagraph('''Permitted residential uses include an apartment dwelling (low and mid-high rise), planned unit
+development, retirement home, rooming house (converted), stacked and townhouse dwelling, among
+others.''')
+        self.insertParagraph('''The subject property is subject to a holding designation which prohibits any development on the property
+until:''')
+
+        t = ListFlowable(
+            [
+                ListItem(Paragraph('''A Site PlanApplication is approved, including the registration of an agreement pursuant
+to Section 41 of the Planning Act to the satisfaction of the General Manager, Planning,
+Infrastructure and Economic Development; and''', self.style_left_listitem), leftIndent=70),
+                ListItem(Paragraph('''Such time as it is demonstrated to the satisfaction of Planning Infrastructure and
+Economic Development that there is availability of and connection to municipal storm
+water infrastructure.''', self.style_left_listitem), leftIndent=70),
+            ], bulletType='i', leftIndent=30
+        )
+
+        FA( t )
+
+
+        self.insertParagraph('''In the TD1 sub-zone on lots greater than 0.3 acresin size the minimum number of residential units per
+hectare is 150 and the minimum floor space index for non-residential use is 0.5 times the site area. In
+accordance with Exception 2755 applicable to the subject property, the following are site specific
+provisions:''')
+        t = ListFlowable(
+            [
+                ListItem(Paragraph('''Minimum interior side yard setback of 3 m on one side, and 6 m on the other; and''', self.style_left_listitem), leftIndent=70),
+                ListItem(Paragraph('''Minimum rear yard setback 6.5 m''', self.style_left_listitem), leftIndent=70),
+            ], bulletType='bullet', start='-', leftIndent=30
+        )
+
+        FA( t )
+
+        self.insertParagraph('''In summary, the subject site is zoned for a number of commercial and residential uses, with a holding
+designation restricting development until various planning steps are approved. The proposed subject
+improvements appear to represent a permitted use under the zoning by-law and to conform to the
+applicable zoning regulations. It is our understanding the client is progressing well with their proposal
+and the City of Ottawa officials are showing a positive interest in the project. However, a compliance
+report from the City of Ottawa would be required to verify that this is the case.''')
+
+
+        FA( PageBreak() )
+    #///////////////////////////////////////// page 26 //////////////////////////////////////////////////////
+        FA( Paragraph('HIGHEST AND BEST USE', self.style_title) )
+
+        self.insertParagraph('''Highest and Best Use may be defined as, "that use from among reasonably, probable and legal
+alternativeuses,foundtobe physicallypossible, appropriatelysupported,financiallyfeasible, andwhich
+results in the highest land value."''')
+        self.insertParagraph('''Interpretation of the foregoing includes a realization that the use must be physically possible, legal
+and/or probable, there is demand for the use, it is financially feasible hence profitable, and it yieldsthe
+highest return to the land.''')
+        self.insertParagraph('''The subject is located on the west side of Labrie Avenue, to the south of Cyrville Road, in the Cyrville
+Industrial Park in the east end of the City of Ottawa. It islocated within 600metres oftheCyrville LRT
+station, as well as proximate to residential developments and other commercial amenities.''')
+        self.insertParagraph('''The site is 14,962 square feet in size with approximately 100.64 feet of frontage along the west side of
+Labrie Avenue. While the property is currently improved, the client in proposing to redevelop the
+property with a six-storey, 45-unit residential apartment building.''')
+        self.insertParagraph('''The property just recently received a zoning by-law amendment from a Light Industrial Zone to a
+TD1[2755] - h - Transit Oriented Development Zone. There is a holding on the zoning until such time
+asthe clientreceivesSite Plan approval and adequate servicing. In accordancewith theTransitOriented
+Development zoning, variousresidential and non-residential uses are permitted. The subject’sproposed
+development appears to be a permitted use in accordance with the amended zoning by-law.''')
+        self.insertParagraph('''Consideration has been given to the residentialrental apartmentmarket which has been performing very
+well over the past few years. The subject islocated in the East Ottawa Surrounding Area sub-zone with
+vacancy reported at 0.4% as at October 2020 which has decreased from the same time the previous year
+when it was at 0.9%. It is also much lower than the overall average for the City at 4.0%. Average
+monthly rents reported for the East Ottawa Surrounding Area sub-zone were $1,017 in 2019 and
+increased to $1,367 in 2020, a 34.5% increase year over year.''')
+        self.insertParagraph('''In conclusion, given the site parcel’s size, recent re-zoning and location, it is our opinion the Highest
+and Best Use of the subject, would be its development with a residential apartment use, as proposed.''')
+
+        FA( PageBreak() )
+    #///////////////////////////////////////// page 27 //////////////////////////////////////////////////////
+        FA( Paragraph('VALUATION', self.style_title) )
+
+        self.insertParagraph('''In order to estimate the current market value of the subject property, the Direct Comparison Approach
+has been used. In the Direct Comparison Approach to valuation,sales ofsimilarsites are analyzed and
+compared to the subject. The sale prices of the comparables are then adjusted for any differences in
+comparison to the site under appraisal.''')
+        self.insertParagraph('''The following comparable land sales have been analyzed in order to estimate the current market value
+of the subject site. Details of the comparable sales analyzed are presented in the appendix and are
+summarized as follows:''')
+
+
+
+
+
+
+        self.insertParagraph('''The comparable sales have been analyzed on the basis oftheir price persquare foot and indicate a range
+of between $117 and $162 per square foot, with three of the five sales ranging between $132 and $140
+per square foot. Adjustments must be made to the indicated sale price per square foot for each sale in
+order to reconcile important differences between the comparable sales and the subject property.
+Attributessuch as overall location, date ofsale, development potential and physical characteristicswere
+taken into consideration.''')
+        self.insertParagraph('''<b>Comparable Sale #1, Lemieux Street & St. Laurent Boulevard,</b> is the purchase of two adjacent
+parcels that were acquired separately. The assembled property is bound by St. Laurent Boulevard,
+Lemieux Street and the extension of Labelle Street, to the south of Ogilvie Road, acrossthe street from
+the St. Laurent Shopping Centre, approximately one kilometre to the west of the subject property. The
+property was zoned TD3, a superior zoning relative to the subject, and is considered to have a superior
+location with good visibility. A downward adjustment to the rate per square foot has been recognized
+for the zoning and location. However, an offsetting upward adjustment to the rate per square foot is
+warranted for the subject’s smaller site area and for the passage of time since the sale dates. It should
+be noted that the property hassubsequently sold at a much higher consideration, but included extensive
+development approvals and plans which is not comparable to the current status of the subject property.''')
+        self.insertParagraph('''<b>Comparable Sale #2, Tremblay Road,</b> representsthe sale of an assembled property that islocated on
+the southwest corner of Tremblay and Belfast Roads as well as the east side of Avenue L, in the East
+Industrial neighbourhood, approximately 2.5 kilometres to the west of the subject. The property was
+improved with two older office buildings at the time of sale. However, there was a March 2021 Site
+Plan proposing the development of the property with a six-storey residential apartment building with
+ground floor retailspace. Similar to the subject, the property was zoned TD1 and islocated within 600
+metres of a light rail transitstation. While an upward adjustment to the rate persquare foot is necessary
+for the passage of time since the date of sale, an offsetting downward adjustment is necessary for the
+comparable’s superior location at a busy intersection and it’s shorter development horizon.''')
+        self.insertParagraph('''<b>Comparable Sale #3, Montreal Road,</b> is the sale of a slightly smaller sized parcel that is located on
+the southeast corner of Montreal Road and Borthwick Avenue, approximately three kilometres to the
+north of the subject. The property islocated 300 metresto the west of Montfort Hospital. The property
+was improved with two older structures, however, a land study completed by the vendor determined a
+six-storey residential building with 30 apartment units and ground floor retail could be constructed on
+the site. The subject is considered to have a shorter development horizon and is located in good
+proximity to the Cyrville light rail transitstation, for which an upward adjustment to the rate persquare
+foot is considered to be necessary. However, a more than offsetting downward adjustment has been
+applied for the comparable’s superior location with frontage on two streets, including Montreal Road
+which is a busy commercial arterial with public transit. Additionally, the comparable is within walking
+distance to the Montfort Hospital which is a major employment centre.''')
+        self.insertParagraph('''<b>Comparable Sale #4, Avenue L,</b> is an older sale of a much larger sized property with frontage and
+access onto four streets, including the south side of Tremblay Road. The property is located to the
+immediate east of the Ottawa Train Station and approximately three kilometres to the west of the
+subject. The property isimproved with a large manufacturing facility. The purchasers completed a sale
+leaseback for a three-yeartermat marketrent. The purchasersintend to redevelop the site with amixeduse high density development. Given the passage of time and the comparable’s superior zoning and
+higher density development potential, a downward adjustment to the rate per square foot is considered
+to be warranted. However, a more than offsetting upward adjustment is necessary for the passage of
+time since the date of sale and for the subject’s smaller site and shorter development horizon.''')
+        self.insertParagraph('''<b>Comparable Sale #5, Smyth Road,</b> is an older sale of a much larger sized site that is located on the
+southeast corner of Smyth Road and Othello Avenue, to the immediate north of Elmvale Shopping
+Centre, approximately three kilometres to the south of the subject. The property was zoned Arterial
+Mainstreet and at the time ofsale there was a June 2019 approved site plan to develop the property with
+a nine-storey residential apartment building with ground floor retail space. The purchaser benefitted
+from the site plan/approvals in place, for which a downward adjustment to the rate per square foot is
+warranted. However, an upward adjustment has been recognized for the passage of time since the date
+of sale and for the subject’s much smaller site area.''')
+
+        self.insertParagraph('''The foregoing salesindicate a range of prices between $117 and $162 per square foot, with three of the
+five sales ranging between $132 and $140 per square foot.''')
+        self.insertParagraph('''Consideration has also been given to the previoussale of the subject in September 2020 at $760,000 or
+$50.80 per square foot of site area. The property was improved with a residential triplex and a
+freestandingoffice unit. Theownersubsequentlycompletedextensive renovations,increasedrentalrates
+and created an enclosed rearstorage yard which has also been leased. This has provided the client with
+continued income while they prepare for mid-term redevelopment of the site. The ownersubsequently
+submitted a Zoning By-law Amendment application to rezone the site to permit a medium density
+residential development. The client recently received rezoning approval as outlined in the Final Letter
+ofEnactment attached in the addendumofthisreport and isworkingwith theCityofOttawa to complete
+all necessary approvals to redevelop the property with a six-storey, 45-unit residential apartment
+building. Given the foregoing, a significant increase to the 2020 purchase price per square foot is
+considered to be necessary given the passage of time, the strong demand and limited supply of
+redevelopment lands within the urban area of the city and for the progress and approvals obtained from
+the City of Ottawa since the date of sale.''')
+        self.insertParagraph('''Having regard to the foregoing sales and analysis, it is our opinion that the current market value of the
+fee simple interest in the subjectsite based on its highest and best use warrants a value within the range
+ofthe comparable sales, namely $135.00 persquare foot ofsite area. Therefore, the market value ofthe
+fee simple interest in the subject site, as at January 25, 2022, is estimated as follows:''')
+
+        FA( Paragraph('14,962 x $135.00 per square foot = $2,019,870', self.style_center_context_spaceAfter) )
+
+        self.insertParagraph('Rounded to:')
+
+        FA( Paragraph('''<b>TWO MILLION AND TWENTY THOUSAND DOLLARS<br/>\
+($2,020,000)</b>''', self.style_center_context_spaceAfter) )
