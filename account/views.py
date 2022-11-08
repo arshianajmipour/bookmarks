@@ -15,6 +15,8 @@ from .forms import LoginForm, UserRegistrationForm, \
     UserEditForm, ProfileEditForm, ReportForm
 from .utils import make_flowables
 from django.contrib.auth import logout
+from rest_framework import viewsets
+from .serializers import ReportSerializer
 
 
 def user_login(request):
@@ -114,6 +116,9 @@ class ReportListView(ListView):
         context['section'] = 'view_reports'
         return context
 
+class ReportView(viewsets.ModelViewSet):
+    serializer_class = ReportSerializer
+    queryset = Report.objects.all()
 
 @login_required
 def submit_done(request):

@@ -1,7 +1,7 @@
 import io
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.platypus import SimpleDocTemplate
-from reportlab.lib.colors import yellow, green, red, black, gray
+from reportlab.lib.colors import yellow, green, red, black, gray, white
 from reportlab.lib.units import inch
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import Paragraph, PageBreak
@@ -50,7 +50,7 @@ class Reporter:
             pagesize=letter,
             topMargin=inch,
             leftMargin=0.9*inch,
-            rightMargin=0.64*inch,
+            rightMargin=0.9*inch,
             bottomMargin=0.75*inch,
             reporter=self
         )
@@ -154,9 +154,14 @@ class Reporter:
 
 
         ################################## Table Styles ###################################################
-        self.table_style_padding_small = TableStyle([
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 0.5),
-            ('TOPPADDING', (0, 0), (-1, -1), 0.5),
+        self.style_table_default = [
+            ('VALIGN', (0, 0), (-1, -1), 'TOP')
+        ]
+
+        self.style_table_padding_small = deepcopy(self.style_table_default)
+        self.style_table_padding_small.extend([
+            ('BOTTOMPADDING', (0, 0), (1, 2), 0.5),
+            ('TOPPADDING', (0, 0), (1, 2), 0.5),
         ])
 
 
@@ -187,7 +192,7 @@ class Reporter:
             textobject.setFillGray(0.5)
             textobject.textLines(
                 '''11966685 Canada Inc.
-                Appraisal Report on 1368 Labrie Avenue, Ottawa, Ontario'''
+                Appraisal Report on {0}'''.format(self.report.municipal_address)
             )
             canvas.drawText(textobject)
 
@@ -288,9 +293,11 @@ class Reporter:
         FA( Paragraph('<b>' + title + '</b>', style_title) )
         FA( Paragraph(context, style_context) )
 
-    def insertParagraph(self, context, style_context=None):
+    def insertParagraph(self, context, style_context=None, font_size=None):
         if style_context == None:
             style_context = self.style_left_context_spaceAfter
+        if font_size != None:
+            style_context.fontSize = font_size
         FA = self.flowables.append
         FA( Paragraph(context, style_context) )
 
@@ -300,6 +307,8 @@ class Reporter:
             style_key = self.style_left_context
         if style_context == None:
             style_context = self.style_left_context
+        if style_table == None:
+            style_table = self.style_table_default
         data = []
         # logger.error(len(args))
         # for i in range(0, len(args), 2):
@@ -313,9 +322,10 @@ class Reporter:
             data.append([Paragraph(tuplee[0] + ':', style_key), Paragraph(tuplee[1], style_context)])
 
         table = Table(data, colWidths=[self.template.width * 2 / 5, self.template.width * 3 / 5])
-        if style_table != None:
-            table.setStyle(style_table)
+        # if style_table == None:
+        table.setStyle(TableStyle(style_table))
         FA( table )
+
 
     def insertQoute(self, context, left_indent=None):
         style = deepcopy(self.style_left_context_indent20)
@@ -324,6 +334,24 @@ class Reporter:
 
         FA = self.flowables.append
         FA(Paragraph('<I>' + context + '</I>', style))
+
+
+    def insertList(self, items, left_indent_item,
+                left_indent_bullet, _bullet, _start=None, style_item=None,):
+
+        FA = self.flowables.append
+        if style_item == None:
+            style_item = self.style_left_listitem
+
+        list_items = []
+        for item in items:
+            list_items.append(ListItem(Paragraph(item, style_item), leftIndent=left_indent_item))
+
+        t = ListFlowable(
+            list_items, start=_start, bulletType=_bullet, leftIndent=left_indent_bullet
+        )
+
+        FA( t )
 
     def createPage(self):
         FA = self.flowables.append
@@ -382,18 +410,28 @@ class Reporter:
         drive-by inspection of the property was completed. Our value estimate is subject to the following
         assumptions and limiting conditions:'''.format(date = self.report.effective_date.strftime('%b %d, %Y')), self.style_left_context_spaceAfter) )
 
-        t = ListFlowable(
-            [
-                ListItem(Paragraph('the property is free and clear of any mortgage charges or title encumbrances;', self.style_left_listitem), leftIndent=41),
-                ListItem(Paragraph('the subject soils are suitable for development;', self.style_left_listitem), leftIndent=41),
-                ListItem(Paragraph('the subject property and neighbouring lands are free of environmental contaminants; and', self.style_left_listitem), leftIndent=41),
-                ListItem(Paragraph('''there are no servicing constraints or extraordinary costs related to the servicing or development
-                of the site.
-                ''', self.style_left_listitem), leftIndent=41),
-            ], start="➢", bulletType='bullet', leftIndent=20
+        # t = ListFlowable(
+        #     [
+        #         ListItem(Paragraph('the property is free and clear of any mortgage charges or title encumbrances;', self.style_left_listitem), leftIndent=41),
+        #         ListItem(Paragraph('the subject soils are suitable for development;', self.style_left_listitem), leftIndent=41),
+        #         ListItem(Paragraph('the subject property and neighbouring lands are free of environmental contaminants; and', self.style_left_listitem), leftIndent=41),
+        #         ListItem(Paragraph('''there are no servicing constraints or extraordinary costs related to the servicing or development
+        #         of the site.
+        #         ''', self.style_left_listitem), leftIndent=41),
+        #     ], start="➢", bulletType='bullet', leftIndent=20
+        # )
+
+        # FA( t )
+
+        self.insertList(items=[
+            'the property is free and clear of any mortgage charges or title encumbrances;',
+            'the subject soils are suitable for development;',
+            'the subject property and neighbouring lands are free of environmental contaminants; and',
+            '''there are no servicing constraints or extraordinary costs related to the servicing or development of the site.'''
+            ],
+            _start="➢", _bullet='bullet', left_indent_item=41, left_indent_bullet=20
         )
 
-        FA( t )
 
         FA( Paragraph('''2255 St. Laurent Blvd.\
         Suite 340\
@@ -492,14 +530,14 @@ Comba Inc.'''),
 #                     Avenue, to the south of Cyrville Road, in theCyrville Industrial
 #                     Area, in the east end of the City of Ottawa.''', self.style_left_context)],
 #                 [Paragraph('Municipal Address:', self.style_left_context),
-#                 Paragraph('''1368 Labrie Avenue, Ottawa, Ontario''', self.style_left_context)],
+#                 Paragraph('''{0}''', self.style_left_context)],
 #                 [Paragraph('Legal Description:', self.style_left_context),
 #                 Paragraph('''The subject property is identified in the Land Registry Office as
 #                     Part of Lot 25, Concession 2, Ottawa Front; designated as Part
 #                     1 on Plan 4R-11032; in the former City of Gloucester, now in
 #                     the City of Ottawa. PIN 04263-0224.''', self.style_left_context)],
 #                 [Paragraph('Site Area:', self.style_left_context),
-#                 Paragraph('14,962 square feet', self.style_left_context)],
+#                 Paragraph('{site_area} square feet', self.style_left_context)],
 #                 [Paragraph('Zoning:', self.style_left_context),
 #                 Paragraph('''The property recently received a zoning by-law amendment to
 # TD1[2755] - Transit Oriented Development Zone. A copy of
@@ -523,12 +561,12 @@ Comba Inc.'''),
             ('Location', '''The subject property is located on the west side of Labrie
                     Avenue, to the south of Cyrville Road, in theCyrville Industrial
                     Area, in the east end of the City of Ottawa.'''),
-            ('Municipal Address', '''1368 Labrie Avenue, Ottawa, Ontario'''),
+            ('Municipal Address', '''{0}'''.format(self.report.municipal_address)),
             ('Legal Description', '''The subject property is identified in the Land Registry Office as
                     Part of Lot 25, Concession 2, Ottawa Front; designated as Part
                     1 on Plan 4R-11032; in the former City of Gloucester, now in
                     the City of Ottawa. PIN 04263-0224.'''),
-            ('Site Area', '14,962 square feet'),
+            ('Site Area', '{site_area} square feet').format(site_area=self.report.site_area),
             ('Zoning', '''The property recently received a zoning by-law amendment to
 TD1[2755] - Transit Oriented Development Zone. A copy of
 the Final Letter of Enactment is attached in the addendum of
@@ -547,23 +585,23 @@ apartment use.'''),
 
 
         # data = [[Paragraph('Total Site Area:', self.style_left_context_indent12),
-        #         Paragraph('''14,962 square feet''', self.style_left_context)],
+        #         Paragraph('''{site_area} square feet''', self.style_left_context)],
         #         [Paragraph('Price Per Sq. Ft.:', self.style_left_context_indent12),
         #         Paragraph('''$135.00''', self.style_left_context)],
         #         [Paragraph('<b>Market Value Estimate:</b>', self.style_left_context_indent12),
         #         Paragraph('''<b>$2,020,000</b>''', self.style_left_context)],
         #         ]
         # table = Table(data, colWidths=[self.template.width * 2 / 5, self.template.width * 3 / 5])
-        # table.setStyle(self.table_style_padding_small)
+        # table.setStyle(self.style_table_padding_small)
         # FA( table )
 
         self.insertKeyContextTable(
-            ('Total Site Area', '''14,962 square feet'''),
+            ('Total Site Area', '''{site_area} square feet''').format(site_area=self.report.site_area),
             ('Price Per Sq. Ft.', '''$135.00'''),
             ('<b>Market Value Estimate:</b>', '''<b>$2,020,000</b>'''),
             style_key=self.style_left_context_indent12,
             style_context=self.style_left_context,
-            style_table=self.table_style_padding_small
+            style_table=self.style_table_padding_small
         )
 
         FA( PageBreak() )
@@ -588,15 +626,22 @@ knowledgeable of the subject property marketplace.'''.format(date=self.report.ef
 of Professional Appraisal Practice of the Appraisal Institute of Canada. We did not complete technical
 investigations such as:''', self.style_left_context_spaceAfter ) )
 
-        t = ListFlowable(
-            [
-                ListItem(Paragraph('an environmental review of the property;', self.style_left_listitem), leftIndent=1*inch),
-                ListItem(Paragraph('a survey of the site;', self.style_left_listitem), leftIndent=1*inch),
-                ListItem(Paragraph('investigations into the bearing qualities of the soils.', self.style_left_listitem), leftIndent=1*inch),
-            ], start="square", bulletType='bullet', leftIndent=0.8*inch
-        )
+        # t = ListFlowable(
+        #     [
+        #         ListItem(Paragraph('an environmental review of the property;', self.style_left_listitem), leftIndent=1*inch),
+        #         ListItem(Paragraph('a survey of the site;', self.style_left_listitem), leftIndent=1*inch),
+        #         ListItem(Paragraph('investigations into the bearing qualities of the soils.', self.style_left_listitem), leftIndent=1*inch),
+        #     ], start="square", bulletType='bullet', leftIndent=0.8*inch
+        # )
 
-        FA( t )
+        # FA( t )
+
+        self.insertList(items=[
+            'an environmental review of the property;',
+            'a survey of the site;',
+            'investigations into the bearing qualities of the soils.',
+        ], _bullet='bullet', left_indent_item=1*inch, left_indent_bullet=0.8*inch)
+
         FA( Paragraph('''Appraisers are not qualified in professional matters like land surveying, engineering, architecture and
 the law, nor are they qualified as building inspectors. Investigations into matters such as these do not
 form part of an appraiser's investigations. We have assumed that there are no hidden or unapparent
@@ -622,19 +667,31 @@ Further, it is assumed that soils are suitable to support development.
 subject property based on its highest and best use. Our value estimate is free and clear of mortgage or
 other encumbrances, unless otherwise indicated, and are subject to the following assumptions:'''
             ,self.style_left_context_spaceAfter))
-        t = ListFlowable(
-            [
-                ListItem(Paragraph('the property is free and clear of any mortgage charges or title encumbrances;', self.style_left_listitem), leftIndent=1*inch),
-                ListItem(Paragraph('''the subject soils are suitable for development;'''
-                    , self.style_left_listitem), leftIndent=1*inch),
-                ListItem(Paragraph('the subject property and neighbouring lands are free of environmental contaminants; and', self.style_left_listitem), leftIndent=1*inch),
-                ListItem(Paragraph(''' there are no servicing constraints or extraordinary costs related to the servicing or
-                    development of the site.''', 
-                    self.style_left_listitem), leftIndent=1*inch),
-            ]
-            , start="square", bulletType='bullet', leftIndent=0.8*inch
+        # t = ListFlowable(
+        #     [
+        #         ListItem(Paragraph('the property is free and clear of any mortgage charges or title encumbrances;', self.style_left_listitem), leftIndent=1*inch),
+        #         ListItem(Paragraph('''the subject soils are suitable for development;'''
+        #             , self.style_left_listitem), leftIndent=1*inch),
+        #         ListItem(Paragraph('the subject property and neighbouring lands are free of environmental contaminants; and', self.style_left_listitem), leftIndent=1*inch),
+        #         ListItem(Paragraph(''' there are no servicing constraints or extraordinary costs related to the servicing or
+        #             development of the site.''', 
+        #             self.style_left_listitem), leftIndent=1*inch),
+        #     ]
+        #     , start="square", bulletType='bullet', leftIndent=0.8*inch
+        # )
+        # FA(t)
+
+        self.insertList(
+            items=[
+                'the property is free and clear of any mortgage charges or title encumbrances;',
+                '''the subject soils are suitable for development;''',
+                'the subject property and neighbouring lands are free of environmental contaminants; and',
+                ''' there are no servicing constraints or extraordinary costs related to the servicing or
+                    development of the site.''',
+            ],
+            _bullet='bullet', left_indent_item=1*inch, left_indent_bullet=0.8*inch
         )
-        FA(t)
+
         FA(Paragraph('<B>Intended Use/User of Appraisal</B>',self.style_left_titr))
         FA(Paragraph('''The intended use of the appraisal is to assist the client in estimating the market value of the subject
             property for mortgage financing purposes. The intended user of this appraisal is'''+
@@ -656,6 +713,8 @@ other encumbrances, unless otherwise indicated, and are subject to the following
             the buyer and the seller each acting prudently, knowledgeable, and for self-interest, assuming
             that neither is under duress.
             ''')
+        self.insertParagraph('''The foregoing definitionwas extracted fromtheCanadian UniformStandards of Professional Appraisal
+Practice (CUSPAP) dated January 1, 2022.''')
         FA(Paragraph('<B>Definition of Exposure Time</B>',self.style_left_titr))
         # FA(Paragraph('''<I>Exposure time, as per the Canadian Uniform Standards of Professional Appraisal Practice (CUSPAP)
         #     dated January 1, 2022, may be defined as follows:</I>''',self.style_left_context_indent20))
@@ -695,7 +754,7 @@ other encumbrances, unless otherwise indicated, and are subject to the following
 
         self.insertParagraphWithTitle('Location', '''The subject site is located on the west side of Labrie Avenue, to the south of Cyrville Road, in the Cyrville Industrial Park, in the east end of the City of Ottawa.''')
 
-        self.insertParagraphWithTitle('Municipal Address', '''The subject's municipal address is 1368 Labrie Avenue, Ottawa, Ontario.''')
+        self.insertParagraphWithTitle('Municipal Address', '''The subject's municipal address is {0}.'''.format(self.report.municipal_address))
 
         self.insertParagraphWithTitle('Legal Description', '''The subject property is legally described as Part of Lot 25, Concession 2, Ottawa Front; designated as
 Part 1 on Plan 4R-11032; in the former City of Gloucester, now in the City of Ottawa. It is identified
@@ -739,7 +798,7 @@ the Cyrville Industrial Area in the east nd of the City of Ottawa.'''),
 - 148.85 feet along the southern boundary;<br/>\
 - 101.02 feet along the western boundary; and<br/>\
 - 148.43 feet along the northern boundary'''),
-            ('Site Area', '14,962 square feet'),
+            ('Site Area', '{site_area} square feet').format(site_area=self.report.site_area),
             ('Topography', 'The overall site has a slight upward slope from the road grade.'),
             ('Access', '''Vehicular access is available via two points of ingress/egress
 from the west side of Labrie Avenue.'''),
@@ -771,7 +830,7 @@ lands.'''),
 
         FA( PageBreak() )
 
-    #///////////////////////////////////////// page 25 //////////////////////////////////////////////////////
+    #///////////////////////////////////////// page 25 & 26 //////////////////////////////////////////////////////
         FA( Paragraph('LAND USE REGULATIONS', self.style_title) )
         self.insertParagraph('''The subject property recently received a zoning by-law amendment from a Light Industrial Zone to a
 TD1[2755] - h - Transit Oriented Development Zone. A copy of the Final Letter of Enactment is
@@ -790,6 +849,22 @@ promote the use of multiple modes of transportation; and,<br/><br/>\
 environments that exhibit high-quality urban design and that establish priority streets
 for active use frontages and streetscaping investment.''', 40)
 
+        self.insertList(
+            items=[
+                '''<I>Establish minimum density targets needed to support Light Rail Transit (LRT) use for
+lands within Council approved Transit Oriented Development Plan areas;</I>''',
+                '''<I>Accommodate a wide range of transit-supportive land uses such as residential, office,
+commercial, retail, arts and culture, entertainment, service and institutional uses in a
+compact pedestrian-oriented built form at medium to high densities;</I>''',
+                '''<I>Locate higher densitiesin proximity toLRTstationsto create focal points of activity and
+promote the use of multiple modes of transportation; and,</I>''',
+                '''<I>Impose development standards that ensure the development of attractive urban
+environments that exhibit high-quality urban design and that establish priority streets
+for active use frontages and streetscaping investment.</I>'''
+            ],
+            _bullet='1', _start='(', left_indent_item=55, left_indent_bullet=15, style_item=self.style_left_context_spaceAfter
+        )
+
         self.insertParagraph('''The TD zone permits a variety of non-residential usesincluding a bank, bar, cinema, community centre,
 diplomatic mission, court house, group home, hospital, hotel, instructional facility, library, medical
 facility, museum, nightclub, office, place of assembly, post office, post-secondary educational
@@ -803,32 +878,51 @@ others.''')
         self.insertParagraph('''The subject property is subject to a holding designation which prohibits any development on the property
 until:''')
 
-        t = ListFlowable(
-            [
-                ListItem(Paragraph('''A Site PlanApplication is approved, including the registration of an agreement pursuant
-to Section 41 of the Planning Act to the satisfaction of the General Manager, Planning,
-Infrastructure and Economic Development; and''', self.style_left_listitem), leftIndent=70),
-                ListItem(Paragraph('''Such time as it is demonstrated to the satisfaction of Planning Infrastructure and
-Economic Development that there is availability of and connection to municipal storm
-water infrastructure.''', self.style_left_listitem), leftIndent=70),
-            ], bulletType='i', leftIndent=30
-        )
+#         t = ListFlowable(
+#             [
+#                 ListItem(Paragraph('''A Site PlanApplication is approved, including the registration of an agreement pursuant
+# to Section 41 of the Planning Act to the satisfaction of the General Manager, Planning,
+# Infrastructure and Economic Development; and''', self.style_left_listitem), leftIndent=70),
+#                 ListItem(Paragraph('''Such time as it is demonstrated to the satisfaction of Planning Infrastructure and
+# Economic Development that there is availability of and connection to municipal storm
+# water infrastructure.''', self.style_left_listitem), leftIndent=70),
+#             ], bulletType='i', leftIndent=30
+#         )
 
-        FA( t )
+#         FA( t )
+
+        self.insertList(
+            items=[
+                '''A Site PlanApplication is approved, including the registration of an agreement pursuant
+to Section 41 of the Planning Act to the satisfaction of the General Manager, Planning,
+Infrastructure and Economic Development; and''',
+                '''Such time as it is demonstrated to the satisfaction of Planning Infrastructure and
+Economic Development that there is availability of and connection to municipal storm
+water infrastructure.'''
+            ],
+            _bullet='i', left_indent_item=70, left_indent_bullet=30
+        )
 
 
         self.insertParagraph('''In the TD1 sub-zone on lots greater than 0.3 acresin size the minimum number of residential units per
 hectare is 150 and the minimum floor space index for non-residential use is 0.5 times the site area. In
 accordance with Exception 2755 applicable to the subject property, the following are site specific
 provisions:''')
-        t = ListFlowable(
-            [
-                ListItem(Paragraph('''Minimum interior side yard setback of 3 m on one side, and 6 m on the other; and''', self.style_left_listitem), leftIndent=70),
-                ListItem(Paragraph('''Minimum rear yard setback 6.5 m''', self.style_left_listitem), leftIndent=70),
-            ], bulletType='bullet', start='-', leftIndent=30
-        )
+        # t = ListFlowable(
+        #     [
+        #         ListItem(Paragraph('''Minimum interior side yard setback of 3 m on one side, and 6 m on the other; and''', self.style_left_listitem), leftIndent=70),
+        #         ListItem(Paragraph('''Minimum rear yard setback 6.5 m''', self.style_left_listitem), leftIndent=70),
+        #     ], bulletType='bullet', start='-', leftIndent=30
+        # )
 
-        FA( t )
+        # FA( t )
+        self.insertList(
+            items=[
+                '''Minimum interior side yard setback of 3 m on one side, and 6 m on the other; and''',
+                '''Minimum rear yard setback 6.5 m''',
+            ],
+            _start='-', _bullet='bullet', left_indent_item=70, left_indent_bullet=30
+        )
 
         self.insertParagraph('''In summary, the subject site is zoned for a number of commercial and residential uses, with a holding
 designation restricting development until various planning steps are approved. The proposed subject
@@ -839,7 +933,7 @@ report from the City of Ottawa would be required to verify that this is the case
 
 
         FA( PageBreak() )
-    #///////////////////////////////////////// page 26 //////////////////////////////////////////////////////
+    #///////////////////////////////////////// page 27 //////////////////////////////////////////////////////
         FA( Paragraph('HIGHEST AND BEST USE', self.style_title) )
 
         self.insertParagraph('''Highest and Best Use may be defined as, "that use from among reasonably, probable and legal
@@ -851,9 +945,9 @@ highest return to the land.''')
         self.insertParagraph('''The subject is located on the west side of Labrie Avenue, to the south of Cyrville Road, in the Cyrville
 Industrial Park in the east end of the City of Ottawa. It islocated within 600metres oftheCyrville LRT
 station, as well as proximate to residential developments and other commercial amenities.''')
-        self.insertParagraph('''The site is 14,962 square feet in size with approximately 100.64 feet of frontage along the west side of
+        self.insertParagraph('''The site is {site_area} square feet in size with approximately 100.64 feet of frontage along the west side of
 Labrie Avenue. While the property is currently improved, the client in proposing to redevelop the
-property with a six-storey, 45-unit residential apartment building.''')
+property with a six-storey, 45-unit residential apartment building.''').format(site_area=self.report.site_area)
         self.insertParagraph('''The property just recently received a zoning by-law amendment from a Light Industrial Zone to a
 TD1[2755] - h - Transit Oriented Development Zone. There is a holding on the zoning until such time
 asthe clientreceivesSite Plan approval and adequate servicing. In accordancewith theTransitOriented
@@ -869,7 +963,7 @@ increased to $1,367 in 2020, a 34.5% increase year over year.''')
 and Best Use of the subject, would be its development with a residential apartment use, as proposed.''')
 
         FA( PageBreak() )
-    #///////////////////////////////////////// page 27 //////////////////////////////////////////////////////
+    #///////////////////////////////////////// page 28 & 29 & 30 //////////////////////////////////////////////////////
         FA( Paragraph('VALUATION', self.style_title) )
 
         self.insertParagraph('''In order to estimate the current market value of the subject property, the Direct Comparison Approach
@@ -881,6 +975,40 @@ of the subject site. Details of the comparable sales analyzed are presented in t
 summarized as follows:''')
 
 
+
+        style = deepcopy(self.style_left_context)
+        style.fontSize = 9
+        style.alignment = TA_LEFT
+        style2 = deepcopy(style)
+        style2.textColor = white
+        style3 = deepcopy(style2)
+        style3.alignment = TA_CENTER
+        data = [
+            [Paragraph('<b>COMPARABLE LAND SALES</b>', style3), '', '', '', '', '', '',],
+            [Paragraph('<b>No.</b>', style3), Paragraph('<b>Location</b>', style3), Paragraph('<b>Date of Sale</b>', style3),
+             Paragraph('<b>Zoning</b>', style3), Paragraph('<b>Site Area (Sq. Ft.)</b>', style3),
+              Paragraph('<b>Price</b>', style3), Paragraph('<b>Price Per Sq. Ft.</b>', style3)],
+            ['1', Paragraph('1200 Lemieux Street & 1209 St. Laurent Boulevard', style), Paragraph('Jul/21 & Nov/20', style), 'TD3', '45,951', '$6,050,000', '$132'],
+            ['Subject:', Paragraph('1368 Labrie Avenue', style2), 'Sept/20', '$760,000', '{site_area}'.format(site_area=self.report.site_area),],
+        ]
+
+        table_style = deepcopy(self.style_table_default)
+        table_style.extend([
+                ('SPAN', (0, 0), (6, 0)),
+                ('ALIGNMENT', (0,0), (-1,-1), 'CENTER'),
+                ('BACKGROUND', (0, 0), (6, 1), black),
+                ('BACKGROUND', (0, -1), (-1, -1), black),
+                ('TEXTCOLOR', (0,0), (6,1), white),
+                ('TEXTCOLOR', (0, -1), (-1, -1), white),
+                ('FONTSIZE', (0,0), (-1,-1) , style.fontSize),
+                ('FONTNAME', (0,0), (-1,-1), 'Times-Roman'),
+                ('BOX', (0,0), (-1, -1), 1, black),
+            ])
+        table = Table(data, style=table_style,
+            colWidths=[self.template.width * 0.08, self.template.width * 0.2, self.template.width * 0.15, None, None, None, None]
+        )
+
+        FA( table )
 
 
 
@@ -958,9 +1086,20 @@ fee simple interest in the subjectsite based on its highest and best use warrant
 ofthe comparable sales, namely $135.00 persquare foot ofsite area. Therefore, the market value ofthe
 fee simple interest in the subject site, as at January 25, 2022, is estimated as follows:''')
 
-        FA( Paragraph('14,962 x $135.00 per square foot = $2,019,870', self.style_center_context_spaceAfter) )
+        FA( Paragraph('{site_area} x $135.00 per square foot = $2,019,870'.format(site_area=self.report.site_area), self.style_center_context_spaceAfter) )
 
         self.insertParagraph('Rounded to:')
 
         FA( Paragraph('''<b>TWO MILLION AND TWENTY THOUSAND DOLLARS<br/>\
 ($2,020,000)</b>''', self.style_center_context_spaceAfter) )
+
+        FA( PageBreak() )
+
+
+    #///////////////////////////////////////// page 31 & 32 & 33 & 34 //////////////////////////////////////////////////////
+
+    #///////////////////////////////////////// page 31 & 32 & 33 & 34 //////////////////////////////////////////////////////
+        FA( Paragraph('CERTIFICATION', self.style_title) )
+        self.insertParagraphWithTitle('Re:<font color="white">TTTTTT</font>Appraisal Report on {0}'.format(self.report.municipal_address),
+        '''I certify to the best of my knowledge and belief that:''')
+

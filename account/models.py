@@ -31,6 +31,8 @@ class Report(models.Model):
     email = models.CharField(max_length=300, null=True, blank=False, verbose_name='Email Address')
     phone_number = models.CharField(max_length=300, null=True, blank=False, verbose_name='Phone Number')
     location = models.TextField(max_length=300, null=True, blank=False, verbose_name='Location')
+    municipal_address = models.TextField(max_length=300, null=True, blank=False, verbose_name='Municipal Address')
+    site_area = models.FloatField(null=True, blank=False, verbose_name='Site Area(Sqr. Ft.)')
     latitude = models.FloatField(null=True, blank=False, verbose_name='Latitude')
     longitude = models.FloatField(null=True, blank=False, verbose_name='Longitude')
     dropdown_feature = models.IntegerField(choices=DROPDOWN_CHOICES, blank=False, null=True,
