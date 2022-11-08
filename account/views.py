@@ -124,6 +124,12 @@ class ReportView(viewsets.ModelViewSet):
 def submit_done(request):
     return render(request, 'account/submit_done.html', )
 
+@login_required
+def delete_report(request, report_id):
+    Report.objects.get(id=report_id).delete()
+    return HttpResponseRedirect('/view_reports/') 
+
+
 
 
 
