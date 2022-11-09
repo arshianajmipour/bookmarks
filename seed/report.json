@@ -3,7 +3,7 @@
     "model": "account.profile",
     "pk": 1,
     "fields": {
-        "user": 3,
+        "user": 1,
         "date_of_birth": null,
         "photo": ""
     }

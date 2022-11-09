@@ -24,7 +24,7 @@ class MyDocTemplate(SimpleDocTemplate):
         currPageTemplate = self.pageTemplate.id
         # if currPageTemplate != None:
         # logger.error(self._reporter.flowables[-1].action[1])
-        self._reporter.setTemplateToNextPage(self.pageTemplate.id)
+        self._reporter.setTemplateToNextPage(currPageTemplate)
         # self._reporter.setTemplateToNextPage("salam")
         if self.page in (1,2,3):
             # logger.error(self._reporter.flowables[-1].action[1])
@@ -566,7 +566,7 @@ Comba Inc.'''),
                     Part of Lot 25, Concession 2, Ottawa Front; designated as Part
                     1 on Plan 4R-11032; in the former City of Gloucester, now in
                     the City of Ottawa. PIN 04263-0224.'''),
-            ('Site Area', '{site_area} square feet').format(site_area=self.report.site_area),
+            ('Site Area', '{site_area} square feet'.format(site_area=self.report.site_area)),
             ('Zoning', '''The property recently received a zoning by-law amendment to
 TD1[2755] - Transit Oriented Development Zone. A copy of
 the Final Letter of Enactment is attached in the addendum of
@@ -596,7 +596,7 @@ apartment use.'''),
         # FA( table )
 
         self.insertKeyContextTable(
-            ('Total Site Area', '''{site_area} square feet''').format(site_area=self.report.site_area),
+            ('Total Site Area', '''{site_area} square feet'''.format(site_area=self.report.site_area)),
             ('Price Per Sq. Ft.', '''$135.00'''),
             ('<b>Market Value Estimate:</b>', '''<b>$2,020,000</b>'''),
             style_key=self.style_left_context_indent12,
@@ -798,7 +798,7 @@ the Cyrville Industrial Area in the east nd of the City of Ottawa.'''),
 - 148.85 feet along the southern boundary;<br/>\
 - 101.02 feet along the western boundary; and<br/>\
 - 148.43 feet along the northern boundary'''),
-            ('Site Area', '{site_area} square feet').format(site_area=self.report.site_area),
+            ('Site Area', '{site_area} square feet'.format(site_area=self.report.site_area)),
             ('Topography', 'The overall site has a slight upward slope from the road grade.'),
             ('Access', '''Vehicular access is available via two points of ingress/egress
 from the west side of Labrie Avenue.'''),
@@ -947,7 +947,7 @@ Industrial Park in the east end of the City of Ottawa. It islocated within 600me
 station, as well as proximate to residential developments and other commercial amenities.''')
         self.insertParagraph('''The site is {site_area} square feet in size with approximately 100.64 feet of frontage along the west side of
 Labrie Avenue. While the property is currently improved, the client in proposing to redevelop the
-property with a six-storey, 45-unit residential apartment building.''').format(site_area=self.report.site_area)
+property with a six-storey, 45-unit residential apartment building.'''.format(site_area=self.report.site_area))
         self.insertParagraph('''The property just recently received a zoning by-law amendment from a Light Industrial Zone to a
 TD1[2755] - h - Transit Oriented Development Zone. There is a holding on the zoning until such time
 asthe clientreceivesSite Plan approval and adequate servicing. In accordancewith theTransitOriented
