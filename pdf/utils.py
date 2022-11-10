@@ -5,7 +5,7 @@ from reportlab.lib.colors import yellow, green, red, black, gray, white
 from reportlab.lib.units import inch
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import Paragraph, PageBreak
-from reportlab.platypus.flowables import Flowable, DocAssert
+from reportlab.platypus.flowables import Flowable, DocAssert, _bulletNames
 from reportlab.platypus import ListFlowable, ListItem, Table, TableStyle, Frame, NextPageTemplate, PageTemplate
 from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT, TA_JUSTIFY
 from copy import copy, deepcopy
@@ -13,22 +13,39 @@ from django.http import FileResponse
 import logging
 import sys
 
+
+_bulletNames['diamondsuit'] = '♦'
+
 logger = logging.getLogger(__name__)
 
 class MyDocTemplate(SimpleDocTemplate):
     def __init__(self, filename, reporter, **kw):
         super().__init__(filename, **kw)
         self._reporter = reporter
-    def afterPage(self):
+    def beforePage(self):
         # logger.error(self.pageTemplate.id)
         currPageTemplate = self.pageTemplate.id
         # if currPageTemplate != None:
         # logger.error(self._reporter.flowables[-1].action[1])
-        self._reporter.setTemplateToNextPage(currPageTemplate)
-        # self._reporter.setTemplateToNextPage("salam")
-        if self.page in (1,2,3):
+
+        # self._reporter.appendNextTemplate(currPageTemplate)
+        self._reporter.insertNextTemplateIntoTop(currPageTemplate)
+
+        # self._reporter.appendNextTemplate("salam")
+        # if self.page in (1,2,3):
             # logger.error(self._reporter.flowables[-1].action[1])
-            logger.error(currPageTemplate)
+            # logger.error(currPageTemplate)
+        if self.page == 4:
+            # logger.error('\tpage')
+            # [logger.error(fl.action[1] + '\t' + str(idx)) for idx, fl in enumerate(self._reporter.flowables) if isinstance(fl, NextPageTemplate)]
+            # logger.error('\n\n')
+            logger.error(self._reporter.flowables[0])
+            # logger.error(self._reporter.flowables[130])
+            # logger.error(self._reporter.flowables[131])
+
+            # logger.error(self._reporter.flowables[142])
+        
+        # logger.error(_bulletNames)
         # logger.error(self._reporter.flowables[0])
         # logger.error(currPageTemplate)
         # for i in self._reporter.flowables:
@@ -48,7 +65,7 @@ class Reporter:
         self.template = MyDocTemplate(
             self.buffer,
             pagesize=letter,
-            topMargin=inch,
+            topMargin=1.05*inch,
             leftMargin=0.9*inch,
             rightMargin=0.9*inch,
             bottomMargin=0.75*inch,
@@ -145,8 +162,9 @@ class Reporter:
         self.style_contactus_small_center.spaceBefore = 0
 
         self.style_title = deepcopy(self.styleH2)
-        self.style_title.fontSize = 15
+        self.style_title.fontSize = 14.5
         self.style_title.alignment = TA_CENTER
+        self.style_title.spaceAfter = 13
 
         # self.style_left_titr_big = deepcopy(self.style_left_titr)
         # self.style_left_titr_big.fontSize = 12
@@ -169,26 +187,19 @@ class Reporter:
         ################################## Templates ###################################################
         frameT = Frame(
             self.template.leftMargin,
-            self.template.bottomMargin,
+            self.template.bottomMargin + 0.15*inch,
             self.template.width,
             self.template.height, id='normal'
         )
         def makeHeaderFooterMain(canvas, doc):
-            import reportlab.rl_config
-            reportlab.rl_config.warnOnMissingFontGlyphs = 0
-            
-
-            from reportlab.pdfbase import pdfmetrics
-            from reportlab.pdfbase.ttfonts import TTFont
-            # pdfmetrics.registerFont(TTFont('Times-Roman-Italic', './time-roman-italic.ttf'))
 
             canvas.saveState()
             textobject = canvas.beginText()
             textobject.setTextOrigin(
                 doc.leftMargin + 0.11*doc.leftMargin,
-                doc.height + doc.bottomMargin + 0.405*inch,
+                doc.height + doc.bottomMargin + 0.41*inch,
             )
-            textobject.setFont("Times-Roman", 10)
+            textobject.setFont("Times-Italic", 10)
             textobject.setFillGray(0.5)
             textobject.textLines(
                 '''11966685 Canada Inc.
@@ -197,8 +208,8 @@ class Reporter:
             canvas.drawText(textobject)
 
 
-            canvas.drawString(
-                doc.leftMargin + doc.width - 0.12*inch,
+            canvas.drawRightString(
+                doc.leftMargin + doc.width - 0.02*inch,
                 doc.height + doc.bottomMargin + 0.3*inch,
                 "%d" % canvas.getPageNumber()
             )
@@ -222,40 +233,43 @@ class Reporter:
                 doc.leftMargin + 0.1*inch,
                 0.7*doc.bottomMargin,
             )
-            textobject.setFont("Times-Roman", 10)
+            textobject.setFont("Times-Italic", 10)
             textobject.setFillGray(0.5)
             textobject.textLine('Juteau Johnson Comba Inc.')
             canvas.drawText(textobject)
-            
-            def stringWidth2(string, font, size):
-                spaces_count = 0
-                for char in string:
-                    if char.isspace():
-                        spaces_count += 1
-                width = canvas.stringWidth(string, font, size)
-                width += spaces_count
-                return width
-            textobject = canvas.beginText()
+    
             string = '104-22-31'
-            # string = '.'
-            font = 'Times-Roman'
+            font = 'Times-Italic'
             font_size = 10
-            
-            textobject.setTextOrigin(
-                doc.leftMargin + doc.width - canvas.stringWidth(string, font, font_size) - 0.06*inch,
-                # doc.leftMargin + doc.width + doc.rightMargin,
-                
+
+            canvas.setFillGray(0.5)
+            canvas.setFont(font, font_size)
+            canvas.drawRightString(
+                doc.leftMargin + doc.width - 0.06*inch,
                 0.7*doc.bottomMargin,
+                string
             )
-            textobject.setFont(font, font_size)
-            textobject.setFillGray(0.5)
-            textobject.textLine(string)
-            canvas.drawText(textobject)
             
             canvas.restoreState()
-            
+        
+        def makeTemplateIntro(canvas, doc):
+            canvas.saveState()
+
+            canvas.drawImage(
+                './JJC.png',
+                doc.width + doc.leftMargin,
+                doc.height + doc.bottomMargin,
+                # 0,
+                # 0,
+                preserveAspectRatio=True,
+                # width=0.5*inch,
+                height=2*inch
+            )
+
+            canvas.restoreState()
+
         self.template.addPageTemplates([
-            PageTemplate(id='intro', frames=frameT),
+            PageTemplate(id='intro', frames=frameT, onPageEnd=makeTemplateIntro),
             PageTemplate(id='main', frames=frameT, onPageEnd=makeHeaderFooterMain)
         ])
         # logger.error(self.template.pageTemplates[0].autoNextPageTemplate)
@@ -278,8 +292,11 @@ class Reporter:
         self.buffer.seek(0)
         return FileResponse(self.buffer, as_attachment=True, filename='hello.pdf')
 
-    def setTemplateToNextPage(self, template_id):
+    def appendNextTemplate(self, template_id):
         self.flowables.append(NextPageTemplate(template_id))
+
+    def insertNextTemplateIntoTop(self, template_id):
+        self.flowables.insert(0, NextPageTemplate(template_id))
 
 
     def insertParagraphWithTitle(self, title, context, style_title=None, style_context=None):
@@ -358,7 +375,7 @@ class Reporter:
         # page_number = int(page_number)
 
         # if page_number == 1:
-        # self.setTemplateToNextPage('intro')
+        # self.appendNextTemplate('intro')
         # FA(DocAssert('doc.pageTemplate.id=="intro"','expected doc.pageTemplate.id=="main"'))
         
         
@@ -474,7 +491,7 @@ assistance in these or other matters, please do not hesitate to contact us.''', 
         FA(PageBreak())
         
         #/////////////////////////////////// page 5 /////////////////////////////////////////////////////////
-        self.setTemplateToNextPage('main')
+        self.appendNextTemplate('main')
         FA(PageBreak())
         #/////////////////////////////////// page 6 & 7 /////////////////////////////////////////////////////////
         
@@ -838,16 +855,16 @@ attached in the addendumofthisreport. In accordance with theCityof Ottawa’s co
 by-law (2008-250) that was approved by City Council on June 25, 2008, the purpose of the Transit
 Oriented Development is to:''')
         
-        self.insertQoute('''(1) Establish minimum density targets needed to support Light Rail Transit (LRT) use for
-lands within Council approved Transit Oriented Development Plan areas;<br/><br/>\
-(2) Accommodate a wide range of transit-supportive land uses such as residential, office,
-commercial, retail, arts and culture, entertainment, service and institutional uses in a
-compact pedestrian-oriented built form at medium to high densities;<br/><br/>\
-(3) Locate higher densitiesin proximity toLRTstationsto create focal points of activity and
-promote the use of multiple modes of transportation; and,<br/><br/>\
-(4) Impose development standards that ensure the development of attractive urban
-environments that exhibit high-quality urban design and that establish priority streets
-for active use frontages and streetscaping investment.''', 40)
+#         self.insertQoute('''(1) Establish minimum density targets needed to support Light Rail Transit (LRT) use for
+# lands within Council approved Transit Oriented Development Plan areas;<br/><br/>\
+# (2) Accommodate a wide range of transit-supportive land uses such as residential, office,
+# commercial, retail, arts and culture, entertainment, service and institutional uses in a
+# compact pedestrian-oriented built form at medium to high densities;<br/><br/>\
+# (3) Locate higher densitiesin proximity toLRTstationsto create focal points of activity and
+# promote the use of multiple modes of transportation; and,<br/><br/>\
+# (4) Impose development standards that ensure the development of attractive urban
+# environments that exhibit high-quality urban design and that establish priority streets
+# for active use frontages and streetscaping investment.''', 40)
 
         self.insertList(
             items=[
@@ -1100,6 +1117,40 @@ fee simple interest in the subject site, as at January 25, 2022, is estimated as
 
     #///////////////////////////////////////// page 31 & 32 & 33 & 34 //////////////////////////////////////////////////////
         FA( Paragraph('CERTIFICATION', self.style_title) )
-        self.insertParagraphWithTitle('Re:<font color="white">TTTTTT</font>Appraisal Report on {0}'.format(self.report.municipal_address),
+        self.insertParagraphWithTitle('Re:<font color="white">TT</font>Appraisal Report on {0}'.format(self.report.municipal_address),
         '''I certify to the best of my knowledge and belief that:''')
 
+
+        style = deepcopy(self.style_left_listitem)
+        style.alignment = TA_JUSTIFY
+        self.insertList(
+            items=[
+                'The statements of fact contained in this report are true and correct.',
+                '''The reported analyses, opinions, and conclusions are limited only by the reported assumptions and
+limiting conditions, and are my personal, impartial, and unbiased professional analyses, opinions,
+and conclusions.''',
+                '''I have no past, present or prospective interest in the property that isthe subject of thisreport and no
+personal and/or professional interest or conflict with respect to the parties involved with this
+assignment.''',
+                '''I have no bias with respect to the property that is the subject matter of this report or to the parties
+involved with this assignment.''',
+                '''My engagement in and compensation for this assignment were not contingent upon developing or
+reporting predetermined results, the amount of the value estimate, or a conclusion favouring the
+client or the occurrence of a subsequent event.''',
+                '''My analyses, opinions, and conclusions were developed, and this report has been prepared, in
+conformity with the Canadian Uniform Standards of Professional Appraisal Practice (CUSPAP).''',
+                '''I have the knowledge, skills and experience to complete the assignment competently, and where
+applicable this report is co-signed in compliance with CUSPAP.''',
+                '''Except as herein disclosed, no one provided professional assistance or third party professional
+assistance to the person(s) signing this report.''',
+                '''As ofthe date ofthisreport, the undersigned hasfulfilled the requirements ofTheAppraisalInstitute
+of Canada's (AIC's) Continuing Professional Development Program.''',
+                '''The undersigned is a member in good standing of the Appraisal Institute of Canada.''',
+                '''I did personally complete a drive-by inspection of the subject property of the report on January 25, 2022.''',
+                '''Based upon the data, analyses and conclusions contained herein, it is our opinion that the market
+value ofthe fee simple interest in the subject propertybased on its highest and best use, as atJanuary
+24, 2022, is <b>$2,020,000</b>.''',
+            ],
+            _bullet='bullet', _start='diamondsuit', left_indent_item=20, left_indent_bullet=20,
+            style_item=style
+        )
