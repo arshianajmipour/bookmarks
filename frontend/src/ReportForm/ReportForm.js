@@ -14,7 +14,7 @@ function ReportForm() {
             <p>
                 you can add a report here
             </p>
-            <ReportFormFields current={selected}/>
+            
             <nav aria-label="Page navigation example dark">
             <ul class="pagination justify-content-center">
                 {/* <li class="page-item ">
@@ -31,6 +31,7 @@ function ReportForm() {
                 </li> */}
             </ul>
             </nav>
+            <ReportFormFields current={selected}/>
         </div>
         </>
     )
