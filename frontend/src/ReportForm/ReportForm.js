@@ -3,8 +3,8 @@ import "./ReportForm.css";
 import ReportFormFields from "../ReportFormFields/ReportFormFields";
 
 function ReportForm() {
-    const [selected,setSelected]=useState(2);
-    const pages = [{name:1},{name:2},{name:3},{name:4},{name:5}];
+    const [selected,setSelected]=useState("Information");
+    const pages = [{name:"Information"},{name:"Location"}];
 
 
     return(
@@ -17,18 +17,18 @@ function ReportForm() {
             <ReportFormFields current={selected}/>
             <nav aria-label="Page navigation example dark">
             <ul class="pagination justify-content-center">
-                <li class="page-item ">
+                {/* <li class="page-item ">
                   <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                </li>
+                </li> */}
                 {pages.map((page) => {
                     return <li className={`page-item ${(selected==page.name)?"active":""}`}
                         onClick ={()=>setSelected(page.name)} >
                         <a class="page-link" href="#">{page.name}</a>
                     </li>;
                 })}
-                <li class="page-item">
+                {/* <li class="page-item">
                 <a class="page-link" href="#">Next</a>
-                </li>
+                </li> */}
             </ul>
             </nav>
         </div>
