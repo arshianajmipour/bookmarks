@@ -1,23 +1,31 @@
 import React, { useState } from "react";
 import "./ReportFormFields.css"
+import axios from 'axios'
 
 
 function ReportFormFields({current}) {
     const [ReportInfo,setReportInfo]=useState({})
 
-    const  submit = (e) => {
+    const submit = (e) => {
         e.preventDefault();
-        fetch('http://localhost:8000/api/reports/',{
-            method:"POST",
-            body:JSON.stringify(ReportInfo),
-            headers:{
-                "content-type" : "Aplication/json"
-            }
-        }
-        )
-        .then((res)=>res.json)
-        .then((data)=>console.log(data))
-        .then((error)=>console.log(error))
+        // fetch('/api/reports/',{
+        //     method:"POST",
+        //     body:JSON.stringify(ReportInfo),
+        //     headers:{
+        //         "content-type" : "Application/json"
+        //     }
+        // }
+        // )
+        // .then((res)=>res.json)
+        // .then((data)=>console.log(data))
+        // .then((error)=>console.log(error))
+
+        axios
+            // .post("http://localhost:8000/api/reports/", (ReportInfo))
+            .post("/api/reports/", (ReportInfo))
+            .then((res => console.log(res)))
+
+        console.log(ReportInfo)
         
     }
 
@@ -82,7 +90,7 @@ function ReportFormFields({current}) {
                             onChange={(e)=>setReportInfo({...ReportInfo,phone_number: e.target.value})}/>  
 
                     </div>  
-                </div>                                     
+                </div>
             </>                  
                 :<></>
             }
@@ -118,8 +126,8 @@ function ReportFormFields({current}) {
                             onChange={(e)=>setReportInfo({...ReportInfo,longitude : e.target.value})}/>  
 
                     </div>  
-                </div> 
-                <button class = "btn btn-primary bt-lg btn-block mb-3" type = "submit"> Continue to Checkout </button>                             
+                </div>
+                <button class = "btn btn-primary bt-lg btn-block mb-3" type = "submit"> Continue to Checkout </button>
                 </>
                 :<></>
             }

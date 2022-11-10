@@ -2,13 +2,14 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:8000",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
+    "http-proxy-middleware": "^2.0.6",
+    "npm-watch": "^0.11.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-pagination-bar": "^2.0.1",
@@ -20,7 +21,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "watch": "npm-watch"
   },
   "eslintConfig": {
     "extends": [
@@ -39,5 +41,13 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "watch": {
+    "build": {
+      "patterns": [
+        "src"
+      ],
+      "extensions": "js,jsx"
+    }
   }
 }
