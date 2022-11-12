@@ -102,7 +102,7 @@ class Reporter:
 
         self.style_right_big_spaceBefore_big = deepcopy(self.style_right_big)
         self.style_right_big_spaceBefore_big.textColor = '#043475'
-        self.style_right_big_spaceBefore_big.spaceBefore = 87.5
+        self.style_right_big_spaceBefore_big.spaceBefore = 92
         self.style_right_big_spaceBefore_big.spaceAfter = 0
 
         self.style_right_big_spaceBefore_small = deepcopy(self.style_right_big_spaceBefore_big)
@@ -112,13 +112,13 @@ class Reporter:
         self.style_contactus = deepcopy(self.styleN)
         self.style_contactus.alignment = TA_CENTER
         self.style_contactus.fontSize = 12
-        self.style_contactus.leading = 12
+        self.style_contactus.leading = 13
         self.style_contactus.textColor = '#043475'
-        self.style_contactus.rightIndent = -280
-        self.style_contactus.spaceBefore = 130
+        self.style_contactus.rightIndent = -310
+        self.style_contactus.spaceBefore = 120
 
         self.style_contactus2 = deepcopy(self.style_contactus)
-        self.style_contactus2.fontSize = 10
+        self.style_contactus2.fontSize = 8
         self.style_contactus2.spaceBefore = 0
         self.style_contactus2.spaceAfter = 0
 
@@ -191,6 +191,18 @@ class Reporter:
             self.template.width,
             self.template.height, id='normal'
         )
+        frame_intro1 = Frame(
+            self.template.leftMargin,
+            self.template.bottomMargin - 0.28*inch,
+            self.template.width + 0.225*inch,
+            self.template.height * 0.86, id='frame-intro1'
+        )
+        frame_intro2 = Frame(
+            self.template.leftMargin,
+            self.template.bottomMargin + 0.15*inch,
+            self.template.width + 0.225*inch,
+            self.template.height, id='frame-intro2'
+        )
         def makeHeaderFooterMain(canvas, doc):
 
             canvas.saveState()
@@ -257,19 +269,67 @@ class Reporter:
 
             canvas.drawImage(
                 './JJC.png',
-                doc.width + doc.leftMargin,
-                doc.height + doc.bottomMargin,
+                doc.width + 0.225*inch + doc.leftMargin - 0.6*inch,
+                doc.height + doc.bottomMargin - 4.7*inch,
                 # 0,
                 # 0,
                 preserveAspectRatio=True,
-                # width=0.5*inch,
-                height=2*inch
+                width=0.46*inch,
+                # height=2*inch
             )
+            
+            textobject = canvas.beginText()
+            textobject.setTextOrigin(
+                doc.leftMargin + 0.16*inch,
+                doc.bottomMargin + doc.height - 0.1*inch,
+            )
+            textobject.setFont("Times-Roman", 14)
+            textobject.setFillColor('#043475')
+            textobject.textLine('Juteau Johnson Comba Inc')
+            textobject.setTextOrigin(
+                doc.leftMargin + 0.16*inch,
+                doc.bottomMargin + doc.height - 0.27*inch,
+            )
+            textobject.setFont("Times-Roman", 10)
+            textobject.setFillColor(black)
+            textobject.setFillGray(0.5)
+            textobject.textLine('Real Estate Appraisers & Consultants')
+            
+            canvas.drawText(textobject)
+
+            canvas.setStrokeColor('#043475')
+            canvas.line(
+                x1=doc.leftMargin + 0.03*inch,
+                y1=doc.bottomMargin + doc.height + 0.65*inch,
+                x2=doc.leftMargin + 0.03*inch,
+                y2=doc.bottomMargin + doc.height + 0.16*inch
+            )
+
+            canvas.line(
+                x1=doc.leftMargin + 0.03*inch,
+                y1=doc.bottomMargin + doc.height - 0.3*inch,
+                x2=doc.leftMargin + 0.03*inch,
+                y2=doc.bottomMargin
+            )
+
+            canvas.line(
+                x1=doc.leftMargin * 0.48,
+                y1=doc.bottomMargin + doc.height - 0.397*inch,
+                x2=doc.leftMargin + doc.width * 0.57,
+                y2=doc.bottomMargin + doc.height - 0.397*inch
+            )
+
+            
+            
+            # FA( Paragraph('Juteau Johnson Comba Inc', self.style_header1) )
+
+            # FA( Paragraph('Real Estate Appraisers & Consultants', self.style_header2) )
 
             canvas.restoreState()
 
         self.template.addPageTemplates([
-            PageTemplate(id='intro', frames=frameT, onPageEnd=makeTemplateIntro),
+            PageTemplate(id='intro', frames=frame_intro1, onPageEnd=makeTemplateIntro),
+            PageTemplate(id='intro2', frames=frame_intro2, onPageEnd=makeTemplateIntro),
             PageTemplate(id='main', frames=frameT, onPageEnd=makeHeaderFooterMain)
         ])
         # logger.error(self.template.pageTemplates[0].autoNextPageTemplate)
@@ -380,9 +440,9 @@ class Reporter:
         
         
         #/////////////////////////////////// page 1 ///////////////////////////////////////////////////////
-        FA( Paragraph('Juteau Johnson Comba Inc', self.style_header1) )
+        # FA( Paragraph('Juteau Johnson Comba Inc', self.style_header1) )
 
-        FA( Paragraph('Real Estate Appraisers & Consultants', self.style_header2) )
+        # FA( Paragraph('Real Estate Appraisers & Consultants', self.style_header2) )
 
         FA( Paragraph('Appraisal Report on:', self.style_right_big_spaceBefore_big) )
         FA( Paragraph(self.report.location, self.style_right_big) )
@@ -406,12 +466,13 @@ class Reporter:
 
         FA( Paragraph('<i>© 2022 Juteau Johnson Comba Inc</i>', self.style_contactus2) )
             
+        self.appendNextTemplate('intro2')
         FA(PageBreak())
 
         #/////////////////////////////////// page 2 /////////////////////////////////////////////////////////
-        FA( Paragraph('Juteau Johnson Comba Inc', self.style_header1) )
+        # FA( Paragraph('Juteau Johnson Comba Inc', self.style_header1) )
 
-        FA( Paragraph('Real Estate Appraisers & Consultants', self.style_header2) )
+        # FA( Paragraph('Real Estate Appraisers & Consultants', self.style_header2) )
 
         FA( Paragraph(self.report.report_date.strftime('%b %d, %Y'), self.style_right_small) )
         FA( Paragraph('Reference No. ' + self.report.ref_code, self.style_right_small) )
@@ -464,8 +525,8 @@ class Reporter:
         # FA(DocAssert('doc.pageTemplate.id=="introtrbtg"','expected doc.pageTemplate.id=="main"'))
         # logger.error(self.template.docEval('doc.pageTemplate'))
         
-        FA( Paragraph('Juteau Johnson Comba Inc', self.style_header1) )
-        FA( Paragraph(' Real Estate Appraisers & Consultants \n \n', self.style_header2) )
+        # FA( Paragraph('Juteau Johnson Comba Inc', self.style_header1) )
+        # FA( Paragraph(' Real Estate Appraisers & Consultants \n \n', self.style_header2) )
         FA( Paragraph('page 2', self.style_left_small) )
         FA( Paragraph('Reference No. ' + self.report.ref_code, self.style_left_small) )
         FA( Paragraph(self.report.report_date.strftime('%b %d, %Y') + '<br/><br/>', self.style_left_small) )
