@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "bootstrap5",
     "account",
     "pdf",
+    "django_vite"
 ]
 
 MIDDLEWARE = [
@@ -116,9 +117,21 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
+DJANGO_VITE_ASSETS_PATH = BASE_DIR / "static" / "dist"
+
+DJANGO_VITE_DEV_MODE = DEBUG
+
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [ os.path.join(BASE_DIR,'static') ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
+STATICFILES_DIRS = [
+    str(BASE_DIR / "static"),DJANGO_VITE_ASSETS_PATH
+]
+
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+]
+
+STATIC_ROOT = "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -148,6 +161,6 @@ LOGGING = {
     },
 }
 
-CORS_ORIGIN_WHITELIST = [
-     'http://localhost:3000'
-]
+# CORS_ORIGIN_WHITELIST = [
+#      'http://localhost:3000'
+# ]

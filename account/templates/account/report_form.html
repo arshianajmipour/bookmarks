@@ -1,9 +1,20 @@
 {% extends "base.html" %}
+{% load django_vite %}
 
 {% block title %}Report Form{% endblock %}
 
+
+
+{% block head_js %}
+  {{ block.super }}
+  
+  
+  <!-- {% vite_asset 'js/main.jsx' %} -->
+  {% vite_hmr_client %}
+{% endblock %}
+
 {% block content %}
-  <form method="post" class="{% comment %}d-flex flex-column{% endcomment %} align-items-center container mt-2">
+  <!-- <form method="post" class="{% comment %}d-flex flex-column{% endcomment %} align-items-center container mt-2">
     <div class="col-md-6 w-auto card px-3 py-5 d-flex justify-content-center  text-secondary">
       <h1>adding report form</h1>
       <p>
@@ -29,6 +40,13 @@
       </div>
 
     </div>
-  </form>
+  </form> -->
+
+  <div id="report-form"></div>
   
+{% endblock %}
+
+{% block footer_js %}
+    {{ block.super }}
+    {% vite_asset 'js/main.jsx' %}
 {% endblock %}

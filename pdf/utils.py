@@ -1,4 +1,5 @@
 import io
+import os
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.platypus import SimpleDocTemplate
 from reportlab.lib.colors import yellow, green, red, black, gray, white
@@ -8,6 +9,7 @@ from reportlab.platypus import Paragraph, PageBreak
 from reportlab.platypus.flowables import Flowable, DocAssert, _bulletNames
 from reportlab.platypus import ListFlowable, ListItem, Table, TableStyle, Frame, NextPageTemplate, PageTemplate
 from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT, TA_JUSTIFY
+from reportlab.lib.utils import ImageReader
 from copy import copy, deepcopy
 from django.http import FileResponse
 import logging
@@ -15,6 +17,7 @@ import sys
 
 
 _bulletNames['diamondsuit'] = '♦'
+_bulletNames['right-arrowhead'] = '⮚'
 
 logger = logging.getLogger(__name__)
 
@@ -44,16 +47,16 @@ class MyDocTemplate(SimpleDocTemplate):
             # logger.error(self._reporter.flowables[131])
 
             # logger.error(self._reporter.flowables[142])
-        
+
         # logger.error(_bulletNames)
         # logger.error(self._reporter.flowables[0])
         # logger.error(currPageTemplate)
         # for i in self._reporter.flowables:
         #     logger.error(i)
-        
+
 
 class Reporter:
-    
+
 
     styles = getSampleStyleSheet()
 
@@ -147,7 +150,7 @@ class Reporter:
 
         self.style_left_context_indent20 = deepcopy(self.style_left_context)
         self.style_left_context_indent20.leftIndent = 20
- 
+
         self.style_left_listitem = deepcopy(self.style_left_context)
         self.style_left_listitem.spaceBefore = 0
         self.style_left_listitem.alignment = TA_LEFT
@@ -201,7 +204,7 @@ class Reporter:
             self.template.leftMargin,
             self.template.bottomMargin + 0.15*inch,
             self.template.width + 0.225*inch,
-            self.template.height, id='frame-intro2'
+            self.template.height * 0.89, id='frame-intro2'
         )
         def makeHeaderFooterMain(canvas, doc):
 
@@ -232,14 +235,14 @@ class Reporter:
             p.lineTo(doc.leftMargin + doc.width - 0.07*inch, doc.height + doc.bottomMargin + 0.2*inch)
             p.close()
             canvas.drawPath(p)
-            
+
             canvas.setStrokeColor(gray)
             p = canvas.beginPath()
             p.moveTo(doc.leftMargin + 0.1*inch, 0.9*doc.bottomMargin)
             p.lineTo(doc.leftMargin + doc.width - 0.07*inch, 0.9*doc.bottomMargin)
             p.close()
             canvas.drawPath(p)
-            
+
             textobject = canvas.beginText()
             textobject.setTextOrigin(
                 doc.leftMargin + 0.1*inch,
@@ -249,7 +252,7 @@ class Reporter:
             textobject.setFillGray(0.5)
             textobject.textLine('Juteau Johnson Comba Inc.')
             canvas.drawText(textobject)
-    
+
             string = '104-22-31'
             font = 'Times-Italic'
             font_size = 10
@@ -261,14 +264,17 @@ class Reporter:
                 0.7*doc.bottomMargin,
                 string
             )
-            
+
             canvas.restoreState()
-        
+
         def makeTemplateIntro(canvas, doc):
             canvas.saveState()
 
+            #logo = ImageReader('http://juteaujohnsoncomba.com/wp-content/uploads/2021/09/cropped-cropped-JJC-Logo-vertical-e1631126319540.jpg')
+            #logo = ImageReader('https://www.google.com/images/srpr/logo11w.png')
+            logo = ImageReader(os.path.dirname(os.path.realpath(__file__)) + '/../JJC.png')
             canvas.drawImage(
-                './JJC.png',
+                logo,
                 doc.width + 0.225*inch + doc.leftMargin - 0.6*inch,
                 doc.height + doc.bottomMargin - 4.7*inch,
                 # 0,
@@ -277,7 +283,7 @@ class Reporter:
                 width=0.46*inch,
                 # height=2*inch
             )
-            
+
             textobject = canvas.beginText()
             textobject.setTextOrigin(
                 doc.leftMargin + 0.16*inch,
@@ -294,7 +300,7 @@ class Reporter:
             textobject.setFillColor(black)
             textobject.setFillGray(0.5)
             textobject.textLine('Real Estate Appraisers & Consultants')
-            
+
             canvas.drawText(textobject)
 
             canvas.setStrokeColor('#043475')
@@ -319,17 +325,90 @@ class Reporter:
                 y2=doc.bottomMargin + doc.height - 0.397*inch
             )
 
-            
-            
+
+
             # FA( Paragraph('Juteau Johnson Comba Inc', self.style_header1) )
 
             # FA( Paragraph('Real Estate Appraisers & Consultants', self.style_header2) )
 
             canvas.restoreState()
 
+        def makeTemplateIntro2(canvas, doc):
+            canvas.saveState()
+
+            #logo = ImageReader('http://juteaujohnsoncomba.com/wp-content/uploads/2021/09/cropped-cropped-JJC-Logo-vertical-e1631126319540.jpg')
+            #logo = ImageReader('https://www.google.com/images/srpr/logo11w.png')
+            logo = ImageReader(os.path.dirname(os.path.realpath(__file__)) + '/../JJC.png')
+            canvas.drawImage(
+                logo,
+                doc.width + 0.225*inch + doc.leftMargin - 0.6*inch,
+                doc.height + doc.bottomMargin - 4.7*inch,
+                # 0,
+                # 0,
+                preserveAspectRatio=True,
+                width=0.46*inch,
+                # height=2*inch
+            )
+
+            textobject = canvas.beginText()
+            textobject.setTextOrigin(
+                doc.leftMargin + 0.45*inch,
+                doc.bottomMargin + doc.height - 0.1*inch,
+            )
+            textobject.setFont("Times-Roman", 14)
+            textobject.setFillColor('#043475')
+            textobject.textLine('Juteau Johnson Comba Inc')
+            textobject.setTextOrigin(
+                doc.leftMargin + 0.45*inch,
+                doc.bottomMargin + doc.height - 0.27*inch,
+            )
+            textobject.setFont("Times-Roman", 10)
+            textobject.setFillColor(black)
+            textobject.setFillGray(0.5)
+            textobject.textLine('Real Estate Appraisers & Consultants')
+
+            canvas.drawText(textobject)
+
+            canvas.setStrokeColor('#043475')
+            canvas.line(
+                x1=doc.leftMargin + 0.03*inch,
+                y1=doc.bottomMargin + doc.height + 0.65*inch,
+                x2=doc.leftMargin + 0.03*inch,
+                y2=doc.bottomMargin + doc.height + 0.16*inch
+            )
+
+            canvas.line(
+                x1=doc.leftMargin + 0.03*inch,
+                y1=doc.bottomMargin + doc.height - 0.3*inch,
+                x2=doc.leftMargin + 0.03*inch,
+                y2=doc.bottomMargin
+            )
+
+            canvas.line(
+                x1=doc.leftMargin * 0.48,
+                y1=doc.bottomMargin + doc.height - 0.397*inch,
+                x2=doc.leftMargin + doc.width * 0.57,
+                y2=doc.bottomMargin + doc.height - 0.397*inch
+            )
+
+            canvas.setFillColor('#043475')
+            canvas.drawCentredString(
+                doc.leftMargin + doc.width * 0.58,
+                doc.bottomMargin,
+                '2255 St. Laurent Blvd. Suite 340 Ottawa, Ontario K1G 4K3'
+            )
+            canvas.drawCentredString(
+                doc.leftMargin + doc.width * 0.58,
+                doc.bottomMargin - 0.2*inch,
+                'Phone: 613-738-2426 Fax: 613-738-0429'
+            )
+
+            canvas.restoreState()
+
         self.template.addPageTemplates([
             PageTemplate(id='intro', frames=frame_intro1, onPageEnd=makeTemplateIntro),
-            PageTemplate(id='intro2', frames=frame_intro2, onPageEnd=makeTemplateIntro),
+            PageTemplate(id='intro2', frames=frame_intro2, onPageEnd=makeTemplateIntro2),
+            PageTemplate(id='blank', frames=frameT),
             PageTemplate(id='main', frames=frameT, onPageEnd=makeHeaderFooterMain)
         ])
         # logger.error(self.template.pageTemplates[0].autoNextPageTemplate)
@@ -342,7 +421,7 @@ class Reporter:
 
         # for i in range(1, 3):
         self.createPage()
-        
+
         return self.buildDoc()
 
     def buildDoc(self):
@@ -437,8 +516,8 @@ class Reporter:
         # if page_number == 1:
         # self.appendNextTemplate('intro')
         # FA(DocAssert('doc.pageTemplate.id=="intro"','expected doc.pageTemplate.id=="main"'))
-        
-        
+
+
         #/////////////////////////////////// page 1 ///////////////////////////////////////////////////////
         # FA( Paragraph('Juteau Johnson Comba Inc', self.style_header1) )
 
@@ -465,7 +544,7 @@ class Reporter:
         Fax: 613-738-0429<br/><br/>''', self.style_contactus) )
 
         FA( Paragraph('<i>© 2022 Juteau Johnson Comba Inc</i>', self.style_contactus2) )
-            
+
         self.appendNextTemplate('intro2')
         FA(PageBreak())
 
@@ -510,27 +589,36 @@ class Reporter:
             _start="➢", _bullet='bullet', left_indent_item=41, left_indent_bullet=20
         )
 
+        self.insertParagraph('''Based on our investigations and analysis of the relevant data, as well as the foregoing terms of reference
+and assumptions, it is our opinion that the market value of the fee simple interest in {loc},
+based on its highest and best use, as at {date}, is:'''.format(date=self.report.effective_date.strftime('%b %d, %Y'), loc=self.report.location))
 
-        FA( Paragraph('''2255 St. Laurent Blvd.\
-        Suite 340\
-        Ottawa, Ontario\
-        K1G 4K3<br/>\
-        Phone: 613-738-2426\
-        Fax: 613-738-0429''', self.style_contactus_small_center) )
+        FA( Paragraph('''<b>TWO MILLION AND TWENTY THOUSAND DOLLARS<br/>\
+($2,020,000)</b>''', self.style_center_context_spaceAfter) )
+
+        self.insertParagraph('<br/><br/><br/>.../2', self.style_right_small)
+
+
+        # FA( Paragraph('''2255 St. Laurent Blvd.\
+        # Suite 340\
+        # Ottawa, Ontario\
+        # K1G 4K3<br/>\
+        # Phone: 613-738-2426\
+        # Fax: 613-738-0429''', self.style_contactus_small_center) )
 
         FA(PageBreak())
         #/////////////////////////////////// page 3 /////////////////////////////////////////////////////////
         # FA(DocAssert('doc.pageTemplate.id=="intro"','expected doc.pageTemplate.id=="main"'))
-        
+
         # FA(DocAssert('doc.pageTemplate.id=="introtrbtg"','expected doc.pageTemplate.id=="main"'))
         # logger.error(self.template.docEval('doc.pageTemplate'))
-        
+
         # FA( Paragraph('Juteau Johnson Comba Inc', self.style_header1) )
         # FA( Paragraph(' Real Estate Appraisers & Consultants \n \n', self.style_header2) )
         FA( Paragraph('page 2', self.style_left_small) )
         FA( Paragraph('Reference No. ' + self.report.ref_code, self.style_left_small) )
         FA( Paragraph(self.report.report_date.strftime('%b %d, %Y') + '<br/><br/>', self.style_left_small) )
-        
+
         FA( Paragraph('''We have prepared this report for you and your associates. It is not to be reproduced, in whole or in part,
 without the written consent of the undersigned. Neither our name nor the material submitted may be
 included in any prospectus, newspaper publicity or as part of any printed material, or used in offerings or
@@ -539,10 +627,12 @@ prior written consent. The report is only valid if it bears the original signatu
         FA( Paragraph('''Our report providing details of the property and our method of valuation is attached. If we can be of further
 assistance in these or other matters, please do not hesitate to contact us.''', self.style_left_context_spaceAfter) )
         FA( Paragraph('''Yours truly,''', self.style_left_context_spaceAfter) )
-        
+
         FA( Paragraph('<b>JUTEAU JOHNSON COMBA INC</b>', self.style_left_context) )
         FA( Paragraph('picture', self.style_left_context) )
         FA( Paragraph('Tania J. McDonald, B.A., AACI, P.App.', self.style_left_context) )
+
+        self.appendNextTemplate('blank')
         FA(PageBreak())
 
 
@@ -550,12 +640,12 @@ assistance in these or other matters, please do not hesitate to contact us.''', 
         FA( Paragraph("AERIAL PHOTOGRAPH OF SUBJECT PROPERTY", self.style_title) )
 
         FA(PageBreak())
-        
+
         #/////////////////////////////////// page 5 /////////////////////////////////////////////////////////
         self.appendNextTemplate('main')
         FA(PageBreak())
         #/////////////////////////////////// page 6 & 7 /////////////////////////////////////////////////////////
-        
+
         style_title2 = deepcopy(self.style_title)
         style_title2.borderPadding = (100,100,100)
         FA( Paragraph("SUMMARY OF SALIENT FACTS AND IMPORTANT CONCLUSIONS", style_title2) )
@@ -686,7 +776,7 @@ apartment use.'''),
 
         #/////////////////////////////////// page 8 /////////////////////////////////////////////////////////
         FA( Paragraph("SCOPE OF THE APPRAISAL", self.style_title) )
-        
+
         FA( Paragraph('''The Scope of the Appraisal describes the extent of the process of collecting, confirming and reporting
 data. With respect to the subject property, this involved the following.
 ''', self.style_left_context_spaceAfter) )
@@ -752,7 +842,7 @@ other encumbrances, unless otherwise indicated, and are subject to the following
         #             , self.style_left_listitem), leftIndent=1*inch),
         #         ListItem(Paragraph('the subject property and neighbouring lands are free of environmental contaminants; and', self.style_left_listitem), leftIndent=1*inch),
         #         ListItem(Paragraph(''' there are no servicing constraints or extraordinary costs related to the servicing or
-        #             development of the site.''', 
+        #             development of the site.''',
         #             self.style_left_listitem), leftIndent=1*inch),
         #     ]
         #     , start="square", bulletType='bullet', leftIndent=0.8*inch
@@ -857,6 +947,7 @@ on an assessment of $536,000. Ontario’s planned reassessment for the 2021-2024
 based on 2019 values has been delayed for a second year due to the Covid-19 Pandemic. Assessments
 for 2022 will continue to be based on the current 2016 value''')
 
+        self.appendNextTemplate('blank')
         FA( PageBreak() )
 
     #///////////////////////////////////////// page 12 //////////////////////////////////////////////////////
@@ -900,7 +991,9 @@ with their removal, correction, or treatment in the event that
 they are found to exist on the subject property or on adjacent
 lands.'''),
         )
-        
+
+
+        self.appendNextTemplate('blank')
         FA( PageBreak() )
 
     #///////////////////////////////////////// page 24 //////////////////////////////////////////////////////
@@ -915,7 +1008,7 @@ TD1[2755] - h - Transit Oriented Development Zone. A copy of the Final Letter of
 attached in the addendumofthisreport. In accordance with theCityof Ottawa’s comprehensive zoning
 by-law (2008-250) that was approved by City Council on June 25, 2008, the purpose of the Transit
 Oriented Development is to:''')
-        
+
 #         self.insertQoute('''(1) Establish minimum density targets needed to support Light Rail Transit (LRT) use for
 # lands within Council approved Transit Oriented Development Plan areas;<br/><br/>\
 # (2) Accommodate a wide range of transit-supportive land uses such as residential, office,
