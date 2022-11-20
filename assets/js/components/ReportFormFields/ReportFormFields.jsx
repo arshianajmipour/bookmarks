@@ -82,8 +82,8 @@ function ReportFormFields({current}) {
                 :<></>
             }
             {
-                current == "Location" ?
-                <>
+            current == "Location" ?
+            <>
                 <div class = "form-row">  
                     <div class = "col-md-6 form-group">  
                         <label for = "location"> location</label>  
