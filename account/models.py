@@ -72,4 +72,9 @@ class Report(models.Model):
     #                                            verbose_name='Radio Button Feature')
     # receive_newsletter = models.BooleanField(null=True, blank=False, verbose_name='Receive NewsLetter')
     # fpdf = models.FileField(upload_to='reports/%Y/%m/%d/',null=True, blank=False, verbose_name='Report File')
+
+    def getEffectiveDateAsString(self):
+        return self.effective_date.strftime('%b %d, %Y')
+    def getReportCompleteDateAsString(self):
+        return self.report_completion_date.strftime('%b %d, %Y')
     

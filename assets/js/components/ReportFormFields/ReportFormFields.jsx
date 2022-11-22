@@ -41,17 +41,17 @@ function ReportFormFields({current}) {
                     </div>  
                 </div>  
                 <div class = "form-row">  
-                <div class = "col-md-6 form-group">  
-                    <label for = "report_date"> report date  </label>  
-                    <input type = "date" class = "form-control" id = "report_date"
-                        onChange={(e)=>setReportInfo({...ReportInfo,report_date : e.target.value})} />  
+                    <div class = "col-md-6 form-group">  
+                        <label for = "report_date"> report date  </label>  
+                        <input type = "date" class = "form-control" id = "report_date"
+                            onChange={(e)=>setReportInfo({...ReportInfo,report_date : e.target.value})} />  
+                    </div>
+                    <div class = "col-md-6 form-group">  
+                        <label for = "effective_date"> effective date</label>  
+                        <input type = "date" class = "form-control" id = "effective_date" placeholder = "effective date"
+                            onChange={(e)=>setReportInfo({...ReportInfo,effective_date : e.target.value})}/>  
+                    </div>  
                 </div>
-                <div class = "col-md-6 form-group">  
-                    <label for = "effective_date"> effective date</label>  
-                    <input type = "date" class = "form-control" id = "effective_date" placeholder = "effective date"
-                        onChange={(e)=>setReportInfo({...ReportInfo,effective_date : e.target.value})}/>  
-                </div>  
-            </div>
                 <div class = "form-row">  
                     <div class = "col-md-6 form-group">  
                         <label for = "client_name"> client name</label>  
