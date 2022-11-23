@@ -2,6 +2,10 @@
     border:none;
     color: #cbcbcb;
 }
+.page-item button{
+    border:none;
+    color: #cbcbcb;
+}
 
 .page-item.active .page-link{
     background-color: white;
