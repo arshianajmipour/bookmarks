@@ -524,16 +524,19 @@ class Reporter:
         # FA( Paragraph('Real Estate Appraisers & Consultants', self.style_header2) )
 
         FA( Paragraph('Appraisal Report on:', self.style_right_big_spaceBefore_big) )
-        FA( Paragraph(self.report.location, self.style_right_big) )
+        FA( Paragraph(self.report.subject_property, self.style_right_big) )
 
         FA( Paragraph('Effective Date:', self.style_right_big_spaceBefore_small) )
-        FA( Paragraph(self.report.effective_date.strftime('%b %d, %Y'), self.style_right_big) )
+        # FA( Paragraph(self.report.effective_date.strftime('%b %d, %Y'), self.style_right_big) )
+        FA( Paragraph(self.report.getEffectiveDateAsString(), self.style_right_big) )
+
 
         FA( Paragraph('Report Date:', self.style_right_big_spaceBefore_small) )
-        FA( Paragraph(self.report.report_date.strftime('%b %d, %Y'), self.style_right_big) )
+        # FA( Paragraph(self.report.report_date.strftime('%b %d, %Y'), self.style_right_big) )
+        FA( Paragraph(self.report.getReportCompleteDateAsString(), self.style_right_big) )
 
         FA( Paragraph('Prepared For:', self.style_right_big_spaceBefore_small) )
-        FA( Paragraph(self.report.client_name, self.style_right_big) )
+        FA( Paragraph(self.report.client_legal_name, self.style_right_big) )
 
         FA( Paragraph('''2255 St. Laurent Blvd.<br/>\
         Suite 340<br/>\
@@ -553,19 +556,20 @@ class Reporter:
 
         # FA( Paragraph('Real Estate Appraisers & Consultants', self.style_header2) )
 
-        FA( Paragraph(self.report.report_date.strftime('%b %d, %Y'), self.style_right_small) )
-        FA( Paragraph('Reference No. ' + self.report.ref_code, self.style_right_small) )
+        FA( Paragraph(self.report.getReportCompleteDateAsString(), self.style_right_small) )
+        FA( Paragraph('Reference No. ' + self.report.file_no, self.style_right_small) )
 
-        FA( Paragraph(self.report.location, self.style_left_small) )
+        FA( Paragraph(self.report.client_legal_name, self.style_left_small) )
+        FA( Paragraph(self.report.client_address, self.style_left_small) )
         FA( Paragraph('<br/>Dear ' + self.report.client_name, self.style_left_small) )
 
-        FA( Paragraph("<b>Re:<font color='white'>TTTTT</font>Appraisal Report on " + self.report.location + "</b><br/>", self.style_left_titr) )
+        FA( Paragraph("<b>Re:<font color='white'>TTTTT</font>Appraisal Report on " + self.report.subject_property + "</b><br/>", self.style_left_titr) )
 
         FA( Paragraph('''In accordance with your request, we have inspected the above-noted property in order to provide you with
         an estimate of the current market value of the fee simple interest in the property based on its highest and
-        best use, for mortgage financing purposes. The effective date of appraisal is {date}, the date a
-        drive-by inspection of the property was completed. Our value estimate is subject to the following
-        assumptions and limiting conditions:'''.format(date = self.report.effective_date.strftime('%b %d, %Y')), self.style_left_context_spaceAfter) )
+        best use, for {purposes} purposes. The effective date of appraisal is {date}, the date a
+        {appraisal_type} of the property was completed. Our value estimate is subject to the following
+        assumptions and limiting conditions:'''.format(date = self.report.getEffectiveDateAsString(), purposes=self.report.purpose, appraisal_type=self.report.appraisal_type), self.style_left_context_spaceAfter) )
 
         # t = ListFlowable(
         #     [
@@ -591,7 +595,7 @@ class Reporter:
 
         self.insertParagraph('''Based on our investigations and analysis of the relevant data, as well as the foregoing terms of reference
 and assumptions, it is our opinion that the market value of the fee simple interest in {loc},
-based on its highest and best use, as at {date}, is:'''.format(date=self.report.effective_date.strftime('%b %d, %Y'), loc=self.report.location))
+based on its highest and best use, as at {date}, is:'''.format(date=self.report.getEffectiveDateAsString(), loc=self.report.subject_property))
 
         FA( Paragraph('''<b>TWO MILLION AND TWENTY THOUSAND DOLLARS<br/>\
 ($2,020,000)</b>''', self.style_center_context_spaceAfter) )
@@ -617,7 +621,7 @@ based on its highest and best use, as at {date}, is:'''.format(date=self.report.
         # FA( Paragraph(' Real Estate Appraisers & Consultants \n \n', self.style_header2) )
         FA( Paragraph('page 2', self.style_left_small) )
         FA( Paragraph('Reference No. ' + self.report.ref_code, self.style_left_small) )
-        FA( Paragraph(self.report.report_date.strftime('%b %d, %Y') + '<br/><br/>', self.style_left_small) )
+        FA( Paragraph(self.report.getReportCompleteDateAsString() + '<br/><br/>', self.style_left_small) )
 
         FA( Paragraph('''We have prepared this report for you and your associates. It is not to be reproduced, in whole or in part,
 without the written consent of the undersigned. Neither our name nor the material submitted may be
@@ -906,7 +910,7 @@ Practice (CUSPAP) dated January 1, 2022.''')
             ,self.style_left_context_spaceAfter))
         FA(Paragraph('<B>Date of Inspection</B>',self.style_left_titr))
         FA(Paragraph('''Inspection, as per theCanadian UniformStandards of Professional Appraisal Practice (CUSPAP) dated'''+
-            self.report.report_date.strftime('%b %d, %Y')+'may be defined as follows:',self.style_left_context_spaceAfter))
+            self.report.getReportCompleteDateAsString()+'may be defined as follows:',self.style_left_context_spaceAfter))
         # FA(Paragraph('''<I>“An observation, site visit, walk through, viewing or non-invasive visual examination
         #     of a property.”</I>
         #     ''',self.style_left_context_indent20))

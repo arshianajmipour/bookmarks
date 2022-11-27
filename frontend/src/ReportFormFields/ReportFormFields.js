@@ -5,6 +5,7 @@ import axios from 'axios'
 
 function ReportFormFields({current}) {
     const [ReportInfo,setReportInfo]=useState({})
+    const [fields,setFields]=useState([])
 
     const submit = (e) => {
         e.preventDefault();
@@ -29,8 +30,28 @@ function ReportFormFields({current}) {
         
     }
 
+
+    useEffect(() => {
+
+        // Fetch the Payroll Data related to the logged in User
+        fetch(`api/reports/1`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                 Authorization: `Token ${localStorage.getItem('token')}`
+            },
+        })
+        .then(res => res.json())
+        .then(data => {
+            setFields(data.fields)
+          });
+    }, []);
+
+
+
     return(
         <form class="align-items-center container mt-2 " onSubmit={submit}>
+            {fields.map(value => value)}
             <h4>{current}</h4>
             {current== "Information" ? 
             <>

@@ -56,6 +56,7 @@ function ReportFormFields({current}) {
                     </div>  
                 </div>  
                 <div class = "form-row">  
+<<<<<<< HEAD
                 <div class = "col-md-6 form-group">  
                     <label for = "report_date"> report date  </label>  
                     <input type = "date" class = "form-control" id = "report_date"
@@ -69,6 +70,19 @@ function ReportFormFields({current}) {
                         value={ReportInfo.effective_date}/>  
                 </div>  
             </div>
+=======
+                    <div class = "col-md-6 form-group">  
+                        <label for = "report_date"> report date  </label>  
+                        <input type = "date" class = "form-control" id = "report_date"
+                            onChange={(e)=>setReportInfo({...ReportInfo,report_date : e.target.value})} />  
+                    </div>
+                    <div class = "col-md-6 form-group">  
+                        <label for = "effective_date"> effective date</label>  
+                        <input type = "date" class = "form-control" id = "effective_date" placeholder = "effective date"
+                            onChange={(e)=>setReportInfo({...ReportInfo,effective_date : e.target.value})}/>  
+                    </div>  
+                </div>
+>>>>>>> 31cb219e718beb6bf2766923cabbf35dc848d529
                 <div class = "form-row">  
                     <div class = "col-md-6 form-group">  
                         <label for = "client_name"> client name</label>  
@@ -103,8 +117,8 @@ function ReportFormFields({current}) {
                 :<></>
             }
             {
-                current == "Location" ?
-                <>
+            current == "Location" ?
+            <>
                 <div class = "form-row">  
                     <div class = "col-md-6 form-group">  
                         <label for = "location"> location</label>  
