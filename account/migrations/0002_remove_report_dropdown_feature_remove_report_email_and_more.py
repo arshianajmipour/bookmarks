@@ -42,10 +42,10 @@ class Migration(migrations.Migration):
             model_name='report',
             name='longitude',
         ),
-        migrations.RemoveField(
-            model_name='report',
-            name='municipal_address',
-        ),
+        # migrations.RemoveField(
+        #     model_name='report',
+        #     name='municipal_address',
+        # ),
         migrations.RemoveField(
             model_name='report',
             name='phone_number',
