@@ -8,17 +8,6 @@ function ReportFormFields({current}) {
 
     const submit = (e) => {
         e.preventDefault();
-        // fetch('/api/reports/',{
-        //     method:"POST",
-        //     body:JSON.stringify(ReportInfo),
-        //     headers:{
-        //         "content-type" : "Application/json"
-        //     }
-        // }
-        // )
-        // .then((res)=>res.json)
-        // .then((data)=>console.log(data))
-        // .then((error)=>console.log(error))
 
         axios
             // .post("http://localhost:8000/api/reports/", (ReportInfo))
@@ -37,15 +26,15 @@ function ReportFormFields({current}) {
                 
                 <div class = "form-row">  
                     <div class = "col-md-6 form-group">  
-                        <label for = "firstname"> First Name </label>  
-                        <input type = "text" class = "form-control" id = "firstname" placeholder = "First Name"
-                            onChange={(e)=>setReportInfo({...ReportInfo,firstname : e.target.value})}
-                            value={ReportInfo.firstname}/>  
+                        <label for = "subject_property"> Subject Property </label>  
+                        <input type = "text" class = "form-control" id = "subject_property" placeholder = "Subject Property"
+                            onChange={(e)=>setReportInfo({...ReportInfo,subject_property : e.target.value})}
+                            value={ReportInfo.subject_property}/>  
                         <div class = "invalid-feedback">  
                             Valid first name is required.  
                         </div>  
                     </div>
-                    <div class = "col-md-6 form-group">  
+                    {/* <div class = "col-md-6 form-group">  
                         <label for = "lastname"> Last Name </label>  
                         <input type = "text" class = "form-control" id = "lastname" placeholder = "Last Name"
                             onChange={(e)=>setReportInfo({...ReportInfo,lastname : e.target.value})}
@@ -53,24 +42,10 @@ function ReportFormFields({current}) {
                         <div class = "invalid-feedback">  
                              Valid last name is required.  
                         </div>  
-                    </div>  
+                    </div>   */}
                 </div>  
                 <div class = "form-row">  
-<<<<<<< HEAD
-                <div class = "col-md-6 form-group">  
-                    <label for = "report_date"> report date  </label>  
-                    <input type = "date" class = "form-control" id = "report_date"
-                        onChange={(e)=>setReportInfo({...ReportInfo,report_date : e.target.value})}
-                        value={ReportInfo.report_date} />  
-                </div>
-                <div class = "col-md-6 form-group">  
-                    <label for = "effective_date"> effective date</label>  
-                    <input type = "date" class = "form-control" id = "effective_date" placeholder = "effective date"
-                        onChange={(e)=>setReportInfo({...ReportInfo,effective_date : e.target.value})}
-                        value={ReportInfo.effective_date}/>  
-                </div>  
-            </div>
-=======
+
                     <div class = "col-md-6 form-group">  
                         <label for = "report_date"> report date  </label>  
                         <input type = "date" class = "form-control" id = "report_date"
@@ -82,7 +57,6 @@ function ReportFormFields({current}) {
                             onChange={(e)=>setReportInfo({...ReportInfo,effective_date : e.target.value})}/>  
                     </div>  
                 </div>
->>>>>>> 31cb219e718beb6bf2766923cabbf35dc848d529
                 <div class = "form-row">  
                     <div class = "col-md-6 form-group">  
                         <label for = "client_name"> client name</label>  
@@ -91,14 +65,14 @@ function ReportFormFields({current}) {
                             value={ReportInfo.client_name}/>  
                     </div>
                     <div class = "col-md-6 form-group">  
-                        <label for = "ref_code"> ref code</label>  
-                        <input type = "text" class = "form-control" id = "ref_code" placeholder = "ref code"
-                            onChange={(e)=>setReportInfo({...ReportInfo,ref_code : e.target.value})}
-                            value={ReportInfo.ref_code}/>  
+                        <label for = "file_no"> ref code</label>  
+                        <input type = "text" class = "form-control" id = "file_no" placeholder = "File No."
+                            onChange={(e)=>setReportInfo({...ReportInfo,file_no : e.target.value})}
+                            value={ReportInfo.file_no}/>  
 
                     </div>  
                 </div>    
-                <div class = "form-row">  
+                {/* <div class = "form-row">  
                     <div class = "col-md-6 form-group">  
                         <label for = "email"> email</label>  
                         <input type = "email" class = "form-control" id = "email" placeholder = "email"
@@ -112,14 +86,14 @@ function ReportFormFields({current}) {
                             value={ReportInfo.phone_number}/>  
 
                     </div>  
-                </div>
+                </div> */}
             </>                  
                 :<></>
             }
             {
             current == "Location" ?
             <>
-                <div class = "form-row">  
+                {/* <div class = "form-row">  
                     <div class = "col-md-6 form-group">  
                         <label for = "location"> location</label>  
                         <textarea type = "textarea" class = "form-control" id = "location" placeholder = "location" rows = "4"
@@ -153,7 +127,7 @@ function ReportFormFields({current}) {
                             value={ReportInfo.longitude}/>  
 
                     </div>  
-                </div>
+                </div> */}
                 <button class = "btn btn-primary bt-lg btn-block mb-3" type = "submit"> Create Report </button>
                 </>
                 :<></>
